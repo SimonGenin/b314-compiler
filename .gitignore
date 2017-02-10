@@ -221,8 +221,11 @@ Temporary Items
 # This is a hard link to the same file in the antlr/import folder. It is just a copy used locally for convenience sake.
 /src/main/antlr4/be/unamur/info/b314/compiler/B314Words.g4
 
-# Genereted tokens
+# Generated tokens
 /src/main/antlr4/be/unamur/info/b314/compiler/B314Words.tokens
 
 # Can be created with the antlr plugin
 gen/
+
+# Generated tokens
+/src/main/antlr4/imports/B314Words.tokens
