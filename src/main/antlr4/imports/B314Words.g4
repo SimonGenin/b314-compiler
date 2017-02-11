@@ -1,6 +1,5 @@
 lexer grammar B314Words;
 
-
 // Identifiers
 
 ID: LETTER (LETTER | DIGIT)* ;
@@ -18,3 +17,16 @@ COMMENT: '/*' .*? '*/' -> skip;
 
 NEWLINE: '\r'? '\n'  -> skip ;
 WS: [ \t]+ -> skip ;
+
+// Primitives
+BOOLEAN: 'Bool';
+INTEGER: 'Int';
+SQUARE : 'Case';
+
+// Symbolic lexemes
+LEFT_BRACKET: '[';
+RIGHT_BRACKET: ']';
+COMMA : ',';
+
+// assign lexeme
+AS: 'as';
