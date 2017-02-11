@@ -1,24 +1,20 @@
 package be.unamur.info.b314.compiler.main;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import be.unamur.info.b314.compiler.B314Lexer;
+import be.unamur.info.b314.compiler.B314Parser;
+import be.unamur.info.b314.compiler.exception.ParsingException;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.antlr.v4.runtime.tree.ParseTreeProperty;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  *
@@ -141,12 +137,77 @@ public class Main {
     /**
      * Compiler Methods, this is where the MAGIC happens !!! \o/
      */
-    private void compile() {
+    private void compile() throws IOException, ParsingException
+    {
     
-    
-       // Put your code here !
-       
-       
+        LOG.debug("Start compilation");
+
+        /*
+         * Parse the input.
+         * Takes in an input file, returns an abstract syntax tree
+         */
+        LOG.debug("Parsing input");
+        B314Parser.RootContext tree = parse(new ANTLRInputStream(new FileInputStream(inputFile)));
+        LOG.debug("Parsing input: done");
+        LOG.debug("AST is {}", tree.toStringTree(parser));
+
+
+
+    }
+
+    // the parser
+    private B314Parser parser;
+
+    /**
+     * Builds the AST from the input.
+     *
+     * If problems come out while parsing, throw a Parsing Exception
+     */
+    private B314Parser.RootContext parse (ANTLRInputStream input) throws ParsingException
+    {
+
+        /*
+         * The lexer is applied to the input and tokenizes it.
+         * The result is a stream of tokens.
+         */
+        CommonTokenStream tokens = new CommonTokenStream(new B314Lexer(input));
+
+        /*
+         * Initializes the parser, based on our grammar.
+         * We give it the tokens so it can apply the grammar rules on them.
+         */
+        parser = new B314Parser(tokens);
+
+        /*
+         * We provide to the parser our own implementation of a error listener.
+         * It will allow us to have more control on error handling.
+         */
+        parser.removeErrorListeners();
+        MyConsoleErrorListener errorListener = new MyConsoleErrorListener();
+        parser.addErrorListener(errorListener);
+
+        B314Parser.RootContext tree;
+
+        /*
+         * Parse the tokens.
+         * If the grammar contains an error, we throw an exception
+         */
+        try {
+            tree = parser.root();
+        } catch (RecognitionException e) {
+            throw new ParsingException("Error while retrieving parsing tree!", e);
+        }
+
+        /*
+         * Check if there was a mistake during the parsing.
+         * If so, throw an exception
+         */
+        if (errorListener.errorHasBeenReported()) {
+            throw new ParsingException("Error while parsing the input!");
+        }
+
+        return tree;
+
     }
 
 }
