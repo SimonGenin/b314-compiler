@@ -26,11 +26,11 @@ expr :
        | expr (MUL|DIV) expr
        | expr MINUS expr
        | expr PLUS expr
+       | NOT expr
        | expr (SMALLER_THAN|GREATER_THAN|EQUALS_TO) expr
        | expr (AND|OR) expr
-       | NOT expr
        | TRUE | FALSE
-       | (ENNEMI) IS (NORTH | SOUTH | EAST | WEST)
+       | ENNEMI IS (NORTH | SOUTH | EAST | WEST)
        | GRAAL IS (NORTH | SOUTH | EAST | WEST)
        | (MAP | RADIO | AMMO | FRUITS | SODA) COUNT
        | DIRT
