@@ -21,6 +21,12 @@ action:   MOVE (NORTH | SOUTH | EAST | WEST)
         | DO NOTHING
         ;
 
+// Fonction declaration
+fctdecl:  ID AS FUNCTION LP ( vardecl (C vardecl)* )? RP CL (scalar|VOID)
+          (DECLARE LOCAL (vardecl+) )?
+          DO instruction+ DONE
+          ;
+
 
 // Declaration
 decl: vardecl | globvardecl ;
@@ -36,7 +42,8 @@ type: scalar | array;
 
 // Expressions
 expr :
-         LP expr RP
+         ID LP (expr (C expr)*)? RP // fonction call
+       | LP expr RP
        | (MINUS)? NUMBER // entier
        | expr MODULO expr
        | expr (MUL|DIV) expr

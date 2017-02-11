@@ -1,13 +1,15 @@
 lexer grammar B314Words;
 
-BOOLEAN: 'Bool';
-INTEGER: 'Int';
-SQUARE : 'Case';
+BOOLEAN: 'boolean';
+INTEGER: 'integer';
+SQUARE : 'case';
+VOID: 'void';
 
 LB: '[';
 RB: ']';
 C : ',';
 SC: ';';
+CL: ':';
 LP: '(';
 RP: ')';
 PLUS: '+';
@@ -40,6 +42,8 @@ SHOOT: 'shoot';
 USE: 'use';
 TO: 'to';
 NOTHING: 'nothing';
+FUNCTION: 'function';
+LOCAL: 'local';
 
 AND: 'and';
 OR: 'or';
