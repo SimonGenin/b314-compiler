@@ -1,0 +1,11 @@
+declare and retain
+    a as integer;
+    b as boolean;
+    f as function (x as case, t as integer) : void
+        declare local
+            i as integer;
+        do if a = x then skip done
+    done
+when your turn
+    when a = 10 do skip done
+by default do skip done

@@ -1,0 +1,4 @@
+declare and retain
+    a as integer;
+
+    by default do skip done
