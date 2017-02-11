@@ -1,5 +1,85 @@
 lexer grammar B314Words;
 
+BOOLEAN: 'boolean';
+INTEGER: 'integer';
+SQUARE : 'case';
+VOID: 'void';
+
+LB: '[';
+RB: ']';
+C : ',';
+SC: ';';
+CL: ':';
+LP: '(';
+RP: ')';
+PLUS: '+';
+MINUS: '-';
+MUL: '*';
+DIV: '/';
+MODULO: '%';
+SMALLER_THAN: '<';
+GREATER_THAN: '>';
+EQUALS_TO: '=';
+
+DECLARE: 'declare';
+RETAIN: 'retain';
+NEARBY: 'nearby';
+COUNT: 'count';
+IS: 'is';
+AS: 'as';
+SKIP_INSTR: 'skip';
+IF: 'if';
+THEN: 'then';
+ELSE: 'else';
+DONE: 'done';
+WHILE: 'while';
+DO: 'do';
+SET: 'set';
+COMPUTE: 'compute';
+NEXT: 'next';
+MOVE: 'move';
+SHOOT: 'shoot';
+USE: 'use';
+TO: 'to';
+NOTHING: 'nothing';
+FUNCTION: 'function';
+LOCAL: 'local';
+WHEN: 'when';
+YOUR_TURN: 'your turn';
+BY_DEFAULT: 'by default';
+
+AND: 'and';
+OR: 'or';
+NOT: 'not';
+
+TRUE: 'true';
+FALSE: 'false';
+
+ENNEMI: 'ennemi';
+ZOMBIE: 'zombie';
+PLAYER: 'player';
+
+LATITUDE: 'latitude';
+LONGITUDE: 'longitude';
+NORTH: 'north';
+SOUTH: 'south';
+EAST: 'east';
+WEST: 'west';
+
+GRID_SIZE: 'grid size';
+
+GRAAL: 'graal';
+MAP: 'map';
+RADIO: 'radio';
+AMMO: 'ammo';
+FRUITS: 'fruits';
+SODA: 'soda';
+
+LIFE: 'life';
+
+DIRT: 'dirt';
+ROCK: 'rock';
+VINES: 'vines';
 
 // Identifiers
 
