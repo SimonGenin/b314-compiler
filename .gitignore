@@ -232,3 +232,6 @@ gen/
 
 # Simon personnal file that doesn't need sharing
 /src/main/antlr4/be/unamur/info/b314/compiler/old_grammar_expressions.txt
+
+# Simon Main.main() compilation output (because I configured it that way)
+/programs/*.out
