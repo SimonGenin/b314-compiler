@@ -2,12 +2,16 @@ grammar B314;
 
 import B314Words;
 
-root: instruction*;
+root: (instruction)+;
 
-instruction: vardecl;
+instruction: decl+ ;
 
-// Declaration of variables
-vardecl: ID AS type;
+// Declaration
+decl: vardecl | globvardecl ;
+// Var declaration
+vardecl: ID AS type SEMI_COLON;
+// Global vars declaration
+globvardecl: DECLARE AND RETAIN vardecl+;
 
 // Types management
 array: scalar LEFT_BRACKET NUMBER (COMMA NUMBER)? RIGHT_BRACKET;
