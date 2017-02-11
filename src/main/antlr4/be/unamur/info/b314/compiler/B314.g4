@@ -9,11 +9,11 @@ instruction: decl+ ;
 // Declaration
 decl: vardecl | globvardecl ;
 // Var declaration
-vardecl: ID AS type SEMI_COLON;
+vardecl: ID AS type SC;
 // Global vars declaration
 globvardecl: DECLARE AND RETAIN vardecl+;
 
 // Types management
-array: scalar LEFT_BRACKET NUMBER (COMMA NUMBER)? RIGHT_BRACKET;
+array: scalar LB NUMBER (C NUMBER)? RB;
 scalar: BOOLEAN | INTEGER | SQUARE;
 type: scalar | array;

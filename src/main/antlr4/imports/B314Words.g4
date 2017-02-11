@@ -6,10 +6,10 @@ INTEGER: 'Int';
 SQUARE : 'Case';
 
 // Symbolic lexemes
-LEFT_BRACKET: '[';
-RIGHT_BRACKET: ']';
-COMMA : ',';
-SEMI_COLON: ';';
+LB: '[';
+RB: ']';
+C : ',';
+SC: ';';
 
 // assign lexeme
 AS: 'as';
