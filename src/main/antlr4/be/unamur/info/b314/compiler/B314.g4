@@ -2,7 +2,17 @@ grammar B314;
 
 import B314Words;
 
-root: (instruction)+;
+root: programme;
+
+
+// the program itself
+programme:  DECLARE AND RETAIN (vardecl SC | fctdecl )*
+            WHEN YOUR_TURN (clauseWhen)* clauseDefault
+            ;
+
+// Clauses
+clauseWhen: WHEN expr ( localvardecl )? DO instruction+ DONE ;
+clauseDefault: BY_DEFAULT ( localvardecl )? DO instruction+ DONE ;
 
 // An instruction
 instruction:   SKIP_INSTR
@@ -23,17 +33,17 @@ action:   MOVE (NORTH | SOUTH | EAST | WEST)
 
 // Fonction declaration
 fctdecl:  ID AS FUNCTION LP ( vardecl (C vardecl)* )? RP CL (scalar|VOID)
-          (DECLARE LOCAL (vardecl+) )?
+          (localvardecl)?
           DO instruction+ DONE
           ;
 
 
-// Declaration
-decl: vardecl | globvardecl ;
 // Var declaration
-vardecl: ID AS type SC;
+vardecl: ID AS type;
 // Global vars declaration
-globvardecl: DECLARE AND RETAIN vardecl+;
+globvardecl: DECLARE AND RETAIN (vardecl SC)+ ;
+// Local var declaration
+localvardecl: DECLARE LOCAL (vardecl SC)+ ;
 
 // Types management
 array: scalar LB NUMBER (C NUMBER)? RB;
