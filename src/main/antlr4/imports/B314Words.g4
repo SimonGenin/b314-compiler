@@ -25,6 +25,21 @@ NEARBY: 'nearby';
 COUNT: 'count';
 IS: 'is';
 AS: 'as';
+SKIP_INSTR: 'skip';
+IF: 'if';
+THEN: 'then';
+ELSE: 'else';
+DONE: 'done';
+WHILE: 'while';
+DO: 'do';
+SET: 'set';
+COMPUTE: 'compute';
+NEXT: 'next';
+MOVE: 'move';
+SHOOT: 'shoot';
+USE: 'use';
+TO: 'to';
+NOTHING: 'nothing';
 
 AND: 'and';
 OR: 'or';
@@ -58,7 +73,6 @@ LIFE: 'life';
 DIRT: 'dirt';
 ROCK: 'rock';
 VINES: 'vines';
-
 
 // Identifiers
 

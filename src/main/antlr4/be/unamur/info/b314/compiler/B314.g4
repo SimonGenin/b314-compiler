@@ -4,7 +4,23 @@ import B314Words;
 
 root: (instruction)+;
 
-instruction: (decl | expr)+;
+// An instruction
+instruction:   SKIP_INSTR
+             | IF expr THEN instruction+ DONE
+             | IF expr THEN instruction+ ELSE instruction+ DONE
+             | WHILE expr DO instruction+ DONE
+             | SET expr TO expr
+             | COMPUTE expr
+             | NEXT action
+             ;
+
+// An action
+action:   MOVE (NORTH | SOUTH | EAST | WEST)
+        | SHOOT (NORTH | SOUTH | EAST | WEST)
+        | USE (MAP | RADIO | FRUITS | SODA)
+        | DO NOTHING
+        ;
+
 
 // Declaration
 decl: vardecl | globvardecl ;
