@@ -229,3 +229,6 @@ gen/
 
 # Generated tokens
 /src/main/antlr4/imports/B314Words.tokens
+
+# Simon personnal file that doesn't need sharing
+/src/main/antlr4/be/unamur/info/b314/compiler/old_grammar_expressions.txt

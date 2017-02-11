@@ -1,23 +1,64 @@
 lexer grammar B314Words;
 
-// Primitives
 BOOLEAN: 'Bool';
 INTEGER: 'Int';
 SQUARE : 'Case';
 
-// Symbolic lexemes
 LB: '[';
 RB: ']';
 C : ',';
 SC: ';';
+LP: '(';
+RP: ')';
+PLUS: '+';
+MINUS: '-';
+MUL: '*';
+DIV: '/';
+MODULO: '%';
+SMALLER_THAN: '<';
+GREATER_THAN: '>';
+EQUALS_TO: '=';
 
-// assign lexeme
+DECLARE: 'declare';
+RETAIN: 'retain';
+NEARBY: 'nearby';
+COUNT: 'count';
+IS: 'is';
 AS: 'as';
 
-// global var lexemes
-DECLARE: 'declare';
 AND: 'and';
-RETAIN: 'retain';
+OR: 'or';
+NOT: 'not';
+
+TRUE: 'true';
+FALSE: 'false';
+
+ENNEMI: 'ennemi';
+ZOMBIE: 'zombie';
+PLAYER: 'player';
+
+LATITUDE: 'latitude';
+LONGITUDE: 'longitude';
+NORTH: 'north';
+SOUTH: 'south';
+EAST: 'east';
+WEST: 'west';
+
+GRID_SIZE: 'grid size';
+
+GRAAL: 'graal';
+MAP: 'map';
+RADIO: 'radio';
+AMMO: 'ammo';
+FRUITS: 'fruits';
+SODA: 'soda';
+
+LIFE: 'life';
+
+DIRT: 'dirt';
+ROCK: 'rock';
+VINES: 'vines';
+
 
 // Identifiers
 
