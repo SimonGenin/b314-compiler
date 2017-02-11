@@ -30,21 +30,9 @@ expr :
        | expr (SMALLER_THAN|GREATER_THAN|EQUALS_TO) expr
        | expr (AND|OR) expr
        | TRUE | FALSE
-       | ENNEMI IS (NORTH | SOUTH | EAST | WEST)
-       | GRAAL IS (NORTH | SOUTH | EAST | WEST)
+       | (ENNEMI|GRAAL) IS (NORTH | SOUTH | EAST | WEST)
        | (MAP | RADIO | AMMO | FRUITS | SODA) COUNT
-       | DIRT
-       | ROCK
-       | VINES
-       | ZOMBIE
-       | PLAYER
-       | ENNEMI
-       | MAP
-       | RADIO
-       | AMMO
-       | FRUITS
-       | SODA
-       | LIFE
+       | DIRT | ROCK | VINES | ZOMBIE | PLAYER | ENNEMI | MAP | RADIO | AMMO | FRUITS | SODA | LIFE
        | NEARBY LB expr C expr RB
        | ID
        | ID LB expr (C expr)? RB // case
