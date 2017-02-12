@@ -7,7 +7,7 @@ root: programme;
 
 
 programme:
-            DECLARE AND RETAIN (vardecl SC | fctdecl )*
+            globdecl
             WHEN YOUR_TURN (clauseWhen)* clauseDefault
             # programRule
             ;
@@ -57,9 +57,9 @@ vardecl:
           # varDecl
           ;
 
-globvardecl:
-              DECLARE AND RETAIN (vardecl SC)+
-              # globalVarDecl
+globdecl:
+              DECLARE AND RETAIN (vardecl SC | fctdecl )*
+              # globalDecl
               ;
 
 localvardecl:
