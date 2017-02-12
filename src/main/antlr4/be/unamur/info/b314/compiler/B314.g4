@@ -5,68 +5,101 @@ import B314Words;
 root: programme;
 
 
-// the program itself
-programme:  DECLARE AND RETAIN (vardecl SC | fctdecl )*
+
+programme:
+            DECLARE AND RETAIN (vardecl SC | fctdecl )*
             WHEN YOUR_TURN (clauseWhen)* clauseDefault
+            # programRule
             ;
 
-// Clauses
-clauseWhen: WHEN expr ( localvardecl )? DO instruction+ DONE ;
-clauseDefault: BY_DEFAULT ( localvardecl )? DO instruction+ DONE ;
 
-// An instruction
-instruction:   SKIP_INSTR
-             | IF expr THEN instruction+ DONE
-             | IF expr THEN instruction+ ELSE instruction+ DONE
-             | WHILE expr DO instruction+ DONE
-             | SET expr TO expr
-             | COMPUTE expr
-             | NEXT action
+clauseWhen:
+            WHEN expr ( localvardecl )? DO instruction+ DONE
+            # whenClause
+            ;
+
+clauseDefault:
+                BY_DEFAULT ( localvardecl )? DO instruction+ DONE
+                # defaultClause
+                ;
+
+
+instruction:
+               SKIP_INSTR                                           # skipInstr
+             | IF expr THEN instruction+ DONE                       # ifThenDoneInstr
+             | IF expr THEN instruction+ ELSE instruction+ DONE     # ifThenElseDoneInstr
+             | WHILE expr DO instruction+ DONE                      # whileDoDoneInstr
+             | SET expr TO expr                                     # setToInstr
+             | COMPUTE expr                                         # computeInstr
+             | NEXT action                                          # nextInstr
              ;
 
-// An action
-action:   MOVE (NORTH | SOUTH | EAST | WEST)
-        | SHOOT (NORTH | SOUTH | EAST | WEST)
-        | USE (MAP | RADIO | FRUITS | SODA)
-        | DO NOTHING
+
+action:
+          MOVE (NORTH | SOUTH | EAST | WEST)     # moveAct
+        | SHOOT (NORTH | SOUTH | EAST | WEST)    # shootAct
+        | USE (MAP | RADIO | FRUITS | SODA)      # useAct
+        | DO NOTHING                             # doNothingAct
         ;
 
-// Fonction declaration
-fctdecl:  ID AS FUNCTION LP ( vardecl (C vardecl)* )? RP CL (scalar|VOID)
+
+fctdecl:
+          ID AS FUNCTION LP ( vardecl (C vardecl)* )? RP CL (scalar|VOID)
           (localvardecl)?
           DO instruction+ DONE
+          # fctDecl
           ;
 
 
-// Var declaration
-vardecl: ID AS type;
-// Global vars declaration
-globvardecl: DECLARE AND RETAIN (vardecl SC)+ ;
-// Local var declaration
-localvardecl: DECLARE LOCAL (vardecl SC)+ ;
 
-// Types management
-array: scalar LB NUMBER (C NUMBER)? RB;
-scalar: BOOLEAN | INTEGER | SQUARE;
+vardecl:
+          ID AS type
+          # varDecl
+          ;
+
+globvardecl:
+              DECLARE AND RETAIN (vardecl SC)+
+              # globalVarDecl
+              ;
+
+localvardecl:
+               DECLARE LOCAL (vardecl SC)+
+               # localVarDecl
+               ;
+
+
+
+array:
+        scalar LB NUMBER (C NUMBER)? RB
+        # arrayType
+        ;
+
+scalar:
+        BOOLEAN | INTEGER | SQUARE
+        # scalarType
+        ;
+
+
 type: scalar | array;
 
-// Expressions
+
 expr :
-         ID LP (expr (C expr)*)? RP // fonction call
-       | LP expr RP
-       | (MINUS)? NUMBER // entier
-       | expr MODULO expr
-       | expr (MUL|DIV) expr
-       | expr MINUS expr
-       | expr PLUS expr
-       | NOT expr
-       | expr (SMALLER_THAN|GREATER_THAN|EQUALS_TO) expr
-       | expr (AND|OR) expr
-       | TRUE | FALSE
-       | (ENNEMI|GRAAL) IS (NORTH | SOUTH | EAST | WEST)
-       | (MAP | RADIO | AMMO | FRUITS | SODA) COUNT
-       | DIRT | ROCK | VINES | ZOMBIE | PLAYER | ENNEMI | MAP | RADIO | AMMO | FRUITS | SODA | LIFE
-       | NEARBY LB expr C expr RB
-       | ID
-       | ID LB expr (C expr)? RB // case
+         ID LP (expr (C expr)*)? RP                                 # funcCallExpr
+       | LP expr RP                                                 # parExrpr
+       | (MINUS)? NUMBER                                            # integerExpr
+       | expr MODULO expr                                           # modExpr
+       | expr (MUL|DIV) expr                                        # mulDivExpr
+       | expr (MINUS|PLUS) expr                                     # plusMinusExpr
+       | NOT expr                                                   # notExpr
+       | expr (SMALLER_THAN|GREATER_THAN|EQUALS_TO) expr            # compExpr
+       | expr (AND|OR) expr                                         # andOrExpr
+       | (TRUE | FALSE)                                             # trueFalseExpr
+       | (ENNEMI|GRAAL) IS (NORTH | SOUTH | EAST | WEST)            # smthIsDirExpr
+       | (MAP | RADIO | AMMO | FRUITS | SODA) COUNT                 # itemCountExpr
+       | (DIRT | ROCK | VINES)                                      # keyWordExpr
+       | (ZOMBIE | PLAYER | ENNEMI)                                 # keyWordExpr
+       | (MAP | RADIO | AMMO | FRUITS | SODA | LIFE)                # keyWordExpr
+       | NEARBY LB expr C expr RB                                   # nearbyExpr
+       | ID                                                         # idExpr
+       | ID LB expr (C expr)? RB                                    # caseExpr
        ;
