@@ -84,15 +84,13 @@ type: scalar | array;
 
 
 expr :
-         ID LP (expr (C expr)*)? RP                                 # funcCallExpr
-       | LP expr RP                                                 # parExrpr
+         LP expr RP                                                 # parExrpr
        | (MINUS)? NUMBER                                            # integerExpr
-       | expr MODULO expr                                           # modExpr
-       | expr (MUL|DIV) expr                                        # mulDivExpr
+       | expr (MODULO|MUL|DIV) expr                                 # modMulDivExpr
        | expr (MINUS|PLUS) expr                                     # plusMinusExpr
-       | NOT expr                                                   # notExpr
        | expr (SMALLER_THAN|GREATER_THAN|EQUALS_TO) expr            # compExpr
        | expr (AND|OR) expr                                         # andOrExpr
+       | NOT expr                                                   # notExpr
        | (TRUE | FALSE)                                             # trueFalseExpr
        | (ENNEMI|GRAAL) IS (NORTH | SOUTH | EAST | WEST)            # smthIsDirExpr
        | (MAP | RADIO | AMMO | FRUITS | SODA) COUNT                 # itemCountExpr
@@ -100,6 +98,7 @@ expr :
        | (ZOMBIE | PLAYER | ENNEMI)                                 # keyWordExpr
        | (MAP | RADIO | AMMO | FRUITS | SODA | LIFE)                # keyWordExpr
        | NEARBY LB expr C expr RB                                   # nearbyExpr
+       | ID LP (expr (C expr)*)? RP                                 # funcCallExpr
        | ID                                                         # idExpr
        | ID LB expr (C expr)? RB                                    # caseExpr
        ;
