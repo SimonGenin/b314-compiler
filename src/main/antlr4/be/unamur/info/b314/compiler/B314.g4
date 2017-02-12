@@ -47,24 +47,24 @@ fctdecl:
           ID AS FUNCTION LP ( vardecl (C vardecl)* )? RP CL (scalar|VOID)
           (localvardecl)?
           DO instruction+ DONE
-          # fctDecl
+          # functionDeclaration
           ;
 
 
 
 vardecl:
           ID AS type
-          # varDecl
+          # variableDeclaration
           ;
 
 globdecl:
               DECLARE AND RETAIN (vardecl SC | fctdecl )*
-              # globalDecl
+              # globalDeclaration
               ;
 
 localvardecl:
                DECLARE LOCAL (vardecl SC)+
-               # localVarDecl
+               # localDeclaration
                ;
 
 
