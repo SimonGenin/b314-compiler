@@ -32,7 +32,7 @@ class CompilerTestHelper {
         ByteArrayOutputStream errContent = new ByteArrayOutputStream();
         System.setErr(new PrintStream(errContent));
         // Launch main method
-        Main.main(new String[]{"-i", inputFile.getAbsolutePath(), "-o", outputFile.getAbsolutePath(), "test"});
+        Main.main(new String[]{"-i", inputFile.getAbsolutePath(), "-o", outputFile.getAbsolutePath()});
         String expected;
         if (ok) {
             expected = String.format("OK%n"); // Using format to prevent EOL compatibility issues

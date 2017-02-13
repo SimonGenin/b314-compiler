@@ -52,9 +52,7 @@ public class Main {
                 // Else start compilation
                 try {
                     main.initialise(line);
-                    if (args.length == 5 && args[4].equals("test"))
-                        main.compileForSyntaxTesting();
-                    else main.compile();
+                    main.compile();
                     System.err.println("OK"); // Print OK on stderr
                 } catch (Exception e) {
                     LOG.error("Exception occured during compilation!", e);
@@ -134,18 +132,6 @@ public class Main {
 
         LOG.debug("Initialisation: done");
     }
-
-    private void compileForSyntaxTesting () {
-
-        /*
-         *  Keep empty.
-         *  This is a way have to right results when testing the syntax.
-         *  Without this, the normal compile method is run and the Assertion errors are caught.
-         *  We don't want that.
-         */
-
-    }
-
     
     /**
      * Compiler Methods, this is where the MAGIC happens !!! \o/
