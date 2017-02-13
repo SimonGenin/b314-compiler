@@ -6,7 +6,7 @@ root: programme;
 
 programme:
             globdecl
-            WHEN YOUR_TURN (clauseWhen)* clauseDefault
+            WHEN YOUR TURN (clauseWhen)* clauseDefault
             # programRule
             ;
 
@@ -17,7 +17,7 @@ clauseWhen:
             ;
 
 clauseDefault:
-                BY_DEFAULT ( localvardecl )? DO instruction+ DONE
+                BY DEFAULT ( localvardecl )? DO instruction+ DONE
                 # defaultClause
                 ;
 
