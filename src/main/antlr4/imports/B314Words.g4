@@ -45,8 +45,10 @@ NOTHING: 'nothing';
 FUNCTION: 'function';
 LOCAL: 'local';
 WHEN: 'when';
-YOUR_TURN: 'your turn';
-BY_DEFAULT: 'by default';
+YOUR: 'your';
+TURN: 'turn';
+BY: 'by';
+DEFAULT: 'default';
 
 AND: 'and';
 OR: 'or';

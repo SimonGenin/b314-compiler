@@ -7,12 +7,12 @@ root: programme;
 
 // the program itself
 programme:  DECLARE AND RETAIN (vardecl SC | fctdecl )*
-            WHEN YOUR_TURN (clauseWhen)* clauseDefault
+            WHEN YOUR TURN (clauseWhen)* clauseDefault
             ;
 
 // Clauses
 clauseWhen: WHEN expr ( localvardecl )? DO instruction+ DONE ;
-clauseDefault: BY_DEFAULT ( localvardecl )? DO instruction+ DONE ;
+clauseDefault: BY DEFAULT ( localvardecl )? DO instruction+ DONE ;
 
 // An instruction
 instruction:   SKIP_INSTR
