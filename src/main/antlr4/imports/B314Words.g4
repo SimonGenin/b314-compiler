@@ -68,7 +68,8 @@ SOUTH: 'south';
 EAST: 'east';
 WEST: 'west';
 
-GRID_SIZE: 'grid size';
+GRID : 'grid';
+SIZE: 'size';
 
 GRAAL: 'graal';
 MAP: 'map';
