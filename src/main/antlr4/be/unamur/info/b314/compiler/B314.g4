@@ -4,7 +4,6 @@ import B314Words;
 
 root: programme;
 
-
 // the program itself
 programme:  DECLARE AND RETAIN (vardecl SC | fctdecl )*
             WHEN YOUR TURN (clauseWhen)* clauseDefault
