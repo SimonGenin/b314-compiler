@@ -2,7 +2,7 @@ lexer grammar B314Words;
 
 BOOLEAN: 'boolean';
 INTEGER: 'integer';
-SQUARE : 'case';
+SQUARE : 'square';
 VOID: 'void';
 
 LB: '[';
