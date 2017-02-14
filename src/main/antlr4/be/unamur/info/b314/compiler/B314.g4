@@ -74,7 +74,6 @@ array:
 
 scalar:
         BOOLEAN | INTEGER | SQUARE
-        # scalarType
         ;
 
 
