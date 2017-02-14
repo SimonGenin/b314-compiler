@@ -1,7 +1,7 @@
 declare and retain
     a as integer;
     b as boolean;
-    f as function (x as case, t as integer) : void
+    f as function (x as square, t as integer) : void
         do skip done
 when your turn
 by default do skip done
