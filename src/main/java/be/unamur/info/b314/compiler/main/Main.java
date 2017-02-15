@@ -150,6 +150,10 @@ public class Main {
         LOG.debug("Parsing input: done");
         LOG.debug("AST is {}", tree.toStringTree(parser));
 
+        SymbolTableVisitor visitor = new SymbolTableVisitor();
+        tree.accept(visitor);
+
+
     }
 
     // the parser
