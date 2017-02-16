@@ -6,7 +6,7 @@ root: programme;
 
 programme:
             globdecl
-            WHEN YOUR TURN (clauseWhen)* clauseDefault
+            WHEN YOUR TURN (clauseWhen)* clauseDefault EOF
             # programRule
             ;
 
