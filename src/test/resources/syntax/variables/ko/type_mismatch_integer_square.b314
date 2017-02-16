@@ -1,0 +1,6 @@
+declare and retain
+    i as integer;
+    s as square;
+when your turn
+when i = s do skip done
+by default do skip done
