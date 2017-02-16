@@ -69,7 +69,6 @@ localvardecl:
 
 array:
         scalar LB NUMBER (C NUMBER)? RB
-        # arrayType
         ;
 
 scalar:
@@ -90,10 +89,11 @@ expr :
        | (TRUE | FALSE)                                             # trueFalseExpr
        | (ENNEMI|GRAAL) IS (NORTH | SOUTH | EAST | WEST)            # smthIsDirExpr
        | (MAP | RADIO | AMMO | FRUITS | SODA) COUNT                 # itemCountExpr
-       | (DIRT | ROCK | VINES)                                      # caseExpr
+       | (DIRT | ROCK | VINES)                                      # squareExpr
        | (ZOMBIE | PLAYER | ENNEMI)                                 # agentExpr
        | (MAP | RADIO | AMMO | FRUITS | SODA
-       | LIFE | LATITUDE | LONGITUDE | GRID SIZE)                   # intVarExpr
+       | LIFE | LATITUDE | LONGITUDE )                              # intVarExpr
+       | GRID SIZE                                                  # gridSizeExpr
        | NEARBY LB expr C expr RB                                   # nearbyExpr
        | ID LP (expr (C expr)*)? RP                                 # funcCallExpr
        | ID                                                         # idExpr
