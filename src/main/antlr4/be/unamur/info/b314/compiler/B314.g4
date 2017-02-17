@@ -6,7 +6,7 @@ root: programme;
 
 programme:
             globdecl
-            WHEN YOUR TURN (clauseWhen)* clauseDefault
+            WHEN YOUR TURN (clauseWhen)* clauseDefault EOF
             # programRule
             ;
 
@@ -69,7 +69,6 @@ localvardecl:
 
 array:
         scalar LB NUMBER (C NUMBER)? RB
-        # arrayType
         ;
 
 scalar:
@@ -78,7 +77,6 @@ scalar:
 
 
 type: scalar | array;
-
 
 expr :
          LP expr RP                                                 # parExrpr
@@ -91,9 +89,11 @@ expr :
        | (TRUE | FALSE)                                             # trueFalseExpr
        | (ENNEMI|GRAAL) IS (NORTH | SOUTH | EAST | WEST)            # smthIsDirExpr
        | (MAP | RADIO | AMMO | FRUITS | SODA) COUNT                 # itemCountExpr
-       | (DIRT | ROCK | VINES)                                      # keyWordExpr
-       | (ZOMBIE | PLAYER | ENNEMI)                                 # keyWordExpr
-       | (MAP | RADIO | AMMO | FRUITS | SODA | LIFE)                # keyWordExpr
+       | (DIRT | ROCK | VINES)                                      # squareExpr
+       | (ZOMBIE | PLAYER | ENNEMI)                                 # agentExpr
+       | (MAP | RADIO | AMMO | FRUITS | SODA
+       | LIFE | LATITUDE | LONGITUDE )                              # intVarExpr
+       | GRID SIZE                                                  # gridSizeExpr
        | NEARBY LB expr C expr RB                                   # nearbyExpr
        | ID LP (expr (C expr)*)? RP                                 # funcCallExpr
        | ID                                                         # idExpr
