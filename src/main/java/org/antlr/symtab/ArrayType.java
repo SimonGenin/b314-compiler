@@ -1,22 +1,27 @@
 package org.antlr.symtab;
 
+import com.sun.istack.internal.Nullable;
+
 /** An element within a type type such is used in C or Java where we need to
  *  indicate the type is an array of some element type like float[] or User[].
  *  It also tracks the size as some types indicate the size of the array.
  */
 public class ArrayType implements Type {
-	protected final Type elemType;
-	protected final int numElems; // some languages allow you to point at arrays of a specific size
 
-	public ArrayType(Type elemType) {
-		this.elemType = elemType;
-		this.numElems = -1;
+	protected Type elemType;
+	protected final Integer firstArg;
+	protected final Integer secondArg;
+
+	public ArrayType(Integer numFirstArg, @Nullable Integer numSecondArg)
+	{
+		this.firstArg = numFirstArg;
+		this.secondArg = numSecondArg;
 	}
 
-	public ArrayType(Type elemType, int numElems)
-	{
-		this.elemType = elemType;
-		this.numElems = numElems;
+	public void setType (Type type) {
+
+		this.elemType = type;
+
 	}
 
 	@Override

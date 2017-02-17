@@ -7,6 +7,8 @@ import org.antlr.symtab.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Array;
+
 /**
  *
  * Created by Simon on 15/02/17.
@@ -126,6 +128,7 @@ public class SymbolTableVisitor extends B314BaseVisitor
     @Override
     public Object visitLocalDeclaration (B314Parser.LocalDeclarationContext ctx)
     {
+
         nextDecl = LOCAL;
         return super.visitLocalDeclaration(ctx);
     }
@@ -197,6 +200,34 @@ public class SymbolTableVisitor extends B314BaseVisitor
     {
         // TODO manage the several possible outcomes
 
+        boolean severalArgs = false;
+
+        int firstArg = Integer.parseInt(ctx.NUMBER(0).getText());
+        int secondArg = 0;
+
+        ArrayType type;
+
+        if ( ctx.NUMBER(1) != null ) {
+
+            severalArgs = true;
+            secondArg = Integer.parseInt(ctx.NUMBER(1).getText());
+
+        }
+
+        if (severalArgs) {
+
+            type = new ArrayType(firstArg, secondArg);
+
+        } else {
+
+            type = new ArrayType(firstArg, null);
+
+        }
+
+        // We set the array type, and visit the scalar for the array type
+        ((TypedSymbol) pendingSymbol).setType(type);
+        ctx.scalar().accept(this);
+
         return null;
     }
 
@@ -204,15 +235,33 @@ public class SymbolTableVisitor extends B314BaseVisitor
     public Object visitScalar (B314Parser.ScalarContext ctx)
     {
 
-        if (ctx.BOOLEAN() != null)
-            ((TypedSymbol)pendingSymbol).setType(booleanType);
+        boolean isArray = false;
 
-        if (ctx.INTEGER() != null)
-            ((TypedSymbol)pendingSymbol).setType(integerType);
+        // If we deal with an array
+        if (((TypedSymbol)pendingSymbol).getType() != null) {
+            isArray = true;
+        }
 
-        if (ctx.SQUARE() != null)
-            ((TypedSymbol)pendingSymbol).setType(squareType);
+        if (ctx.BOOLEAN() != null) {
+            if (!isArray)
+                ((TypedSymbol)pendingSymbol).setType(booleanType);
+            else
+                ((ArrayType)((TypedSymbol)pendingSymbol).getType()).setType(booleanType);
+        }
 
+        if (ctx.INTEGER() != null) {
+            if (!isArray)
+                ((TypedSymbol)pendingSymbol).setType(integerType);
+            else
+                ((ArrayType)((TypedSymbol)pendingSymbol).getType()).setType(integerType);
+        }
+
+        if (ctx.SQUARE() != null) {
+            if (!isArray)
+                ((TypedSymbol)pendingSymbol).setType(squareType);
+            else
+                ((ArrayType)((TypedSymbol)pendingSymbol).getType()).setType(squareType);
+        }
 
         return null;
     }
