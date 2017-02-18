@@ -7,8 +7,6 @@ import org.antlr.symtab.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Array;
-
 /**
  *
  * Created by Simon on 15/02/17.
@@ -28,6 +26,7 @@ public class SymbolTableVisitor extends B314BaseVisitor
     private int nextDecl = LOCAL;
 
     private Symbol pendingSymbol;
+    private boolean isPendingSymbolAnArray = false;
 
     // primitive types
     private PrimitiveType booleanType;
@@ -83,7 +82,6 @@ public class SymbolTableVisitor extends B314BaseVisitor
         predefinedVar16.setType(integerType);
         predefinedVar17.setType(integerType);
 
-
         VariableSymbol predefinedVar18 = new VariableSymbol("dirt");
         VariableSymbol predefinedVar19 = new VariableSymbol("rock");
         VariableSymbol predefinedVar20 = new VariableSymbol("vines");
@@ -119,39 +117,24 @@ public class SymbolTableVisitor extends B314BaseVisitor
     }
 
     @Override
-    public Object visitGlobalDeclaration (B314Parser.GlobalDeclarationContext ctx)
-    {
-        nextDecl = GLOBAL;
-        return super.visitGlobalDeclaration(ctx);
-    }
-
-    @Override
-    public Object visitLocalDeclaration (B314Parser.LocalDeclarationContext ctx)
-    {
-
-        nextDecl = LOCAL;
-        return super.visitLocalDeclaration(ctx);
-    }
-
-    @Override
     public Object visitVariableDeclaration (B314Parser.VariableDeclarationContext ctx)
     {
+
+        // We create the symbol out of the context
         VariableSymbol variableSymbol = new VariableSymbol(ctx.ID().getText());
 
+        // If the symbol already exist in the current or upper scopes, we throw an exception
         if (currentScope.resolve(ctx.ID().getText()) != null) {
-
-            throw new AlreadyUsedIdentifierException("SymbolTableVisitor.visitVariableDeclaration()");
-
+            throw new AlreadyUsedIdentifierException("SymbolTableVisitor.visitVariableDeclaration(context)");
         }
 
-        // TODO do we need this ?
-        if (nextDecl == GLOBAL)
-            variableSymbol.setScope(symbolTable.GLOBALS);
-        else
-            variableSymbol.setScope(currentScope);
+        // We define the scope of the new symbol to the current one.
+        variableSymbol.setScope(currentScope);
 
-        // we keep the ref of the symbol, and go to the type definition
+        // We save the reference of the symbol for later use in the type definition
         pendingSymbol = variableSymbol;
+
+        // We visit the type definition
         ctx.type().accept(this);
 
         return null;
@@ -161,35 +144,38 @@ public class SymbolTableVisitor extends B314BaseVisitor
     public Object visitFunctionDeclaration (B314Parser.FunctionDeclarationContext ctx)
     {
 
+        // Creates the scoped symbol from the context, and set it in its parent scope
         FunctionSymbol functionSymbol = new FunctionSymbol(ctx.ID().getText());
         functionSymbol.setScope(currentScope);
 
+        // Keep a track of the previous scope (parent scope)
         Scope oldScope = currentScope;
 
-        // We set the new scope
+        // We set the new current scope, the function one
         currentScope = functionSymbol;
 
-        // Return type
+        // We set the type of the symbol, using the return type
         if (ctx.VOID() != null) {
             functionSymbol.setType(voidType);
         } else {
+            // If it is a scalar, we visit to know more.
             pendingSymbol = functionSymbol;
             ctx.scalar().accept(this);
         }
 
-        // The parameters
-        nextDecl = LOCAL;
+        // We visit all the parameters declaration of the function, it will add
+        // them to the symbol table.
         for (B314Parser.VardeclContext varDeclaration : ctx.vardecl()) {
             varDeclaration.accept(this);
         }
 
+        // We visit the variables declaration.
         if (ctx.localvardecl() != null)
         {
-            // the local var declarations
             ctx.localvardecl().accept(this);
         }
 
-        // We reastablish the anterior scope
+        // We reestablish the anterior scope (we leave the function scope)
         currentScope = oldScope;
 
         return null;
@@ -198,35 +184,39 @@ public class SymbolTableVisitor extends B314BaseVisitor
     @Override
     public Object visitArray (B314Parser.ArrayContext ctx)
     {
-        // TODO manage the several possible outcomes
-
+        // helper variable
         boolean severalArgs = false;
 
+        // We get the first (and mandatory) index
         int firstArg = Integer.parseInt(ctx.NUMBER(0).getText());
         int secondArg = 0;
 
         ArrayType type;
 
+        // If there is a second argument, we retrieve it.
         if ( ctx.NUMBER(1) != null ) {
-
             severalArgs = true;
             secondArg = Integer.parseInt(ctx.NUMBER(1).getText());
-
         }
 
+        // We initialize our type variable
         if (severalArgs) {
-
             type = new ArrayType(firstArg, secondArg);
-
         } else {
-
             type = new ArrayType(firstArg, null);
-
         }
 
-        // We set the array type, and visit the scalar for the array type
+        // We set the array type to the symbol
         ((TypedSymbol) pendingSymbol).setType(type);
+
+        // We save the fact that we are working on an array, for later use with type definition
+        isPendingSymbolAnArray = true;
+
+        // We visit the type definition to decide which primitive is the array made of.
         ctx.scalar().accept(this);
+
+        // We remove the fact that we are working with an array
+        isPendingSymbolAnArray = false;
 
         return null;
     }
@@ -235,12 +225,14 @@ public class SymbolTableVisitor extends B314BaseVisitor
     public Object visitScalar (B314Parser.ScalarContext ctx)
     {
 
-        boolean isArray = false;
+        // Are we working with an array ?
+        boolean isArray = isPendingSymbolAnArray;
 
-        // If we deal with an array
-        if (((TypedSymbol)pendingSymbol).getType() != null) {
-            isArray = true;
-        }
+        /*
+         * Set the type.
+         * If it is a var, just set the symbol type.
+         * If it is an array, set the primitive type to the arrayType.
+         */
 
         if (ctx.BOOLEAN() != null) {
             if (!isArray)
@@ -262,6 +254,48 @@ public class SymbolTableVisitor extends B314BaseVisitor
             else
                 ((ArrayType)((TypedSymbol)pendingSymbol).getType()).setType(squareType);
         }
+
+        return null;
+    }
+
+    @Override
+    public Object visitWhenClause (B314Parser.WhenClauseContext ctx)
+    {
+        // Define a new local scope to the when structure
+        LocalScope localScope = new LocalScope(currentScope);
+
+        // Save the old scope
+        Scope oldScope = currentScope;
+
+        // Set the new scope
+        currentScope = localScope;
+
+        // visit normally all children
+        super.visitWhenClause(ctx);
+
+        // We exit the when structure, so we put back the old scope
+        currentScope = oldScope;
+
+        return null;
+    }
+
+    @Override
+    public Object visitDefaultClause (B314Parser.DefaultClauseContext ctx)
+    {
+        // Define a new local scope to the when structure
+        LocalScope localScope = new LocalScope(currentScope);
+
+        // Save the old scope
+        Scope oldScope = currentScope;
+
+        // Set the new scope
+        currentScope = localScope;
+
+        // visit normally all children
+        super.visitDefaultClause(ctx);
+
+        // We exit the when structure, so we put back the old scope
+        currentScope = oldScope;
 
         return null;
     }
