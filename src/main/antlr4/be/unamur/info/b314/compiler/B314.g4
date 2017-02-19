@@ -82,20 +82,41 @@ type: scalar | array;
 
 expr :
          LP expr RP                                                 # parExrpr
-       | (MINUS)? NUMBER                                            # integerExpr
-       | expr (MODULO|MUL|DIV) expr                                 # modMulDivExpr
-       | expr (MINUS|PLUS) expr                                     # plusMinusExpr
-       | expr (SMALLER_THAN|GREATER_THAN|EQUALS_TO) expr            # compExpr
-       | expr (AND|OR) expr                                         # andOrExpr
-       | NOT expr                                                   # notExpr
-       | (TRUE | FALSE)                                             # trueFalseExpr
-       | (ENNEMI|GRAAL) IS (NORTH | SOUTH | EAST | WEST)            # smthIsDirExpr
-       | (MAP | RADIO | AMMO | FRUITS | SODA) COUNT                 # itemCountExpr
-       | (DIRT | ROCK | VINES)                                      # keyWordExpr
-       | (ZOMBIE | PLAYER | ENNEMI)                                 # keyWordExpr
-       | (MAP | RADIO | AMMO | FRUITS | SODA | LIFE)                # keyWordExpr
-       | NEARBY LB expr C expr RB                                   # nearbyExpr
-       | ID LP (expr (C expr)*)? RP                                 # funcCallExpr
-       | ID                                                         # idExpr
-       | ID LB expr (C expr)? RB                                    # caseExpr
+       | exprEnt                                                    # entExpr
+       | exprBool                                                   # boolExpr
+       | expr EQUALS_TO expr                                        # equalExpr
+       | exprCase                                                   # caseExpr
        ;
+
+exprEnt :
+              (MINUS)? NUMBER                                                  # integerExpr
+            | (MAP | RADIO | AMMO | FRUITS | SODA) COUNT                       # itemCountExpr
+            | (LATITUDE|LONGITUDE|GRID SIZE)                                   # latLongGridSizeExpr
+            | LIFE                                                             # lifeExpr
+            | exprEnt (MODULO|MUL|DIV) exprEnt                                 # modMulDivExpr
+            | exprEnt (MINUS|PLUS) exprEnt                                     # plusMinusExpr
+            | exprId                                                           # idEntExpr
+            ;
+
+exprBool :
+              (TRUE | FALSE)                                                    # trueFalseExpr
+            | (ENNEMI|GRAAL) IS (NORTH | SOUTH | EAST | WEST)                   # smthIsDirExpr
+            | exprEnt (SMALLER_THAN|GREATER_THAN|EQUALS_TO) exprEnt             # compExpr
+            | exprBool (AND|OR) exprBool                                        # andOrExpr
+            | NOT exprBool                                                      # notExpr
+            | exprId                                                            # idBoolExpr
+            ;
+
+exprCase :
+              (DIRT | ROCK | VINES)                                      # keyWordExpr
+            | (ZOMBIE | PLAYER | ENNEMI)                                 # keyWordExpr
+            | (MAP | RADIO | AMMO | FRUITS | SODA)                       # keyWordExpr
+            | NEARBY LB exprEnt C exprEnt RB                             # nearbyExpr
+            |exprId                                                      # idCaseExpr
+            ;
+
+exprId :
+          ID LP ((expr) (C expr)*)? RP                                     # funcCallExpr
+        | ID                                                               # idExpr
+        | ID LB expr (C expr)? RB                                          # casesExpr
+        ;
