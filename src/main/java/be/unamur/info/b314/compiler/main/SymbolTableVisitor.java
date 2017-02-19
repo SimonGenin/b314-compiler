@@ -33,9 +33,9 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
     public SymbolTableVisitor () {
 
-        symbolTable = new SymbolTable();
+        LOG.debug("[SymTab] initialization");
 
-        // TODO continue to properly rename
+        symbolTable = new SymbolTable();
 
         // Define the primitive types
         booleanType = new PrimitiveType("boolean");
@@ -104,13 +104,30 @@ public class SymbolTableVisitor extends B314BaseVisitor
         symbolTable.definePredefinedSymbol(rockVarSquare);
         symbolTable.definePredefinedSymbol(vinesVarSquare);
 
+        LOG.debug("[SymTab] predefined words set up");
+
+    }
+
+    @Override
+    public Object visitRoot (B314Parser.RootContext ctx)
+    {
+
+        LOG.debug("[SymTab] enter global scope");
         currentScope = symbolTable.GLOBALS;
 
+        super.visitRoot(ctx);
+
+        LOG.debug("[SymTab] leave global scope");
+
+        return null;
     }
 
     @Override
     public Object visitVariableDeclaration (B314Parser.VariableDeclarationContext ctx)
     {
+
+        LOG.debug("[SymTab] visit variable declaration");
+        LOG.debug("[SymTab] variable name is " + ctx.ID().getText());
 
         // We create the symbol out of the context
         VariableSymbol variableSymbol = new VariableSymbol(ctx.ID().getText());
@@ -135,6 +152,10 @@ public class SymbolTableVisitor extends B314BaseVisitor
     @Override
     public Object visitFunctionDeclaration (B314Parser.FunctionDeclarationContext ctx)
     {
+
+        LOG.debug("[SymTab] visit function declaration");
+        LOG.debug("[SymTab] function name is " + ctx.ID().getText());
+        LOG.debug("[SymTab] push function " + ctx.ID().getText() + " scope");
 
         // Creates the scoped symbol from the context, and set it in its parent scope
         FunctionSymbol functionSymbol = new FunctionSymbol(ctx.ID().getText());
@@ -170,12 +191,17 @@ public class SymbolTableVisitor extends B314BaseVisitor
         // We reestablish the anterior scope (we leave the function scope)
         currentScope = oldScope;
 
+        LOG.debug("[SymTab] leave function " + ctx.ID().getText() + " scope");
+
         return null;
     }
 
     @Override
     public Object visitArray (B314Parser.ArrayContext ctx)
     {
+
+        LOG.debug("[SymTab] symbol type is array");
+
         // helper variable
         boolean severalArgs = false;
 
@@ -217,6 +243,8 @@ public class SymbolTableVisitor extends B314BaseVisitor
     public Object visitScalar (B314Parser.ScalarContext ctx)
     {
 
+        LOG.debug("[SymTab] symbol type is scalar");
+
         // Are we working with an array ?
         boolean isArray = isPendingSymbolAnArray;
 
@@ -253,6 +281,10 @@ public class SymbolTableVisitor extends B314BaseVisitor
     @Override
     public Object visitWhenClause (B314Parser.WhenClauseContext ctx)
     {
+
+        LOG.debug("[SymTab] visit when clause");
+        LOG.debug("[SymTab] define new local scope");
+
         // Define a new local scope to the when structure
         LocalScope localScope = new LocalScope(currentScope);
 
@@ -268,12 +300,18 @@ public class SymbolTableVisitor extends B314BaseVisitor
         // We exit the when structure, so we put back the old scope
         currentScope = oldScope;
 
+        LOG.debug("[SymTab] leave local scope");
+
         return null;
     }
 
     @Override
     public Object visitDefaultClause (B314Parser.DefaultClauseContext ctx)
     {
+
+        LOG.debug("[SymTab] visit default clause : ");       ;
+        LOG.debug("[SymTab] define new local scope");
+
         // Define a new local scope to the when structure
         LocalScope localScope = new LocalScope(currentScope);
 
@@ -288,6 +326,8 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
         // We exit the when structure, so we put back the old scope
         currentScope = oldScope;
+
+        LOG.debug("[SymTab] leave local scope");
 
         return null;
     }
