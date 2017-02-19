@@ -118,6 +118,7 @@ public class SymbolTableVisitor extends B314BaseVisitor
         super.visitRoot(ctx);
 
         LOG.debug("[SymTab] leave global scope");
+        LOG.debug("Symbol Table has been generated.");
 
         return null;
     }
