@@ -12,7 +12,7 @@ programme:
 
 
 clauseWhen:
-            WHEN expr ( localvardecl )? DO instruction+ DONE
+            WHEN exprBool ( localvardecl )? DO instruction+ DONE
             # whenClause
             ;
 
@@ -23,13 +23,13 @@ clauseDefault:
 
 
 instruction:
-               SKIP_INSTR                                           # skipInstr
-             | IF expr THEN instruction+ DONE                       # ifThenDoneInstr
-             | IF expr THEN instruction+ ELSE instruction+ DONE     # ifThenElseDoneInstr
-             | WHILE expr DO instruction+ DONE                      # whileDoDoneInstr
-             | SET expr TO expr                                     # setToInstr
-             | COMPUTE expr                                         # computeInstr
-             | NEXT action                                          # nextInstr
+               SKIP_INSTR                                            # skipInstr
+             | IF exprBool THEN instruction+ DONE                    # ifThenDoneInstr
+             | IF exprBool THEN instruction+ ELSE instruction+ DONE  # ifThenElseDoneInstr
+             | WHILE exprBool DO instruction+ DONE                   # whileDoDoneInstr
+             | SET exprId TO expr                                    # setToInstr
+             | COMPUTE expr                                          # computeInstr
+             | NEXT action                                           # nextInstr
              ;
 
 
@@ -80,41 +80,49 @@ type: scalar | array;
 
 expr :
          LP expr RP                                                 # parExrpr
-       | exprEnt                                                    # entExpr
+       | exprInt                                                    # intExpr
        | exprBool                                                   # boolExpr
-       | expr EQUALS_TO expr                                        # equalExpr
        | exprCase                                                   # caseExpr
+       | ID LB exprInt (C exprInt)? RB                              # arrayIndex
+       | ID LP ((expr) (C expr)*)? RP                               # fctCall
+       | ID                                                         # identifier
        ;
 
-exprEnt :
+exprInt :
               (MINUS)? NUMBER                                                  # integerExpr
             | (MAP | RADIO | AMMO | FRUITS | SODA) COUNT                       # itemCountExpr
-            | (LATITUDE|LONGITUDE|GRID SIZE)                                   # latLongGridSizeExpr
+            | (LATITUDE | LONGITUDE | GRID SIZE)                               # latLongGridSizeExpr
             | LIFE                                                             # lifeExpr
-            | exprEnt (MODULO|MUL|DIV) exprEnt                                 # modMulDivExpr
-            | exprEnt (MINUS|PLUS) exprEnt                                     # plusMinusExpr
-            | exprId                                                           # idEntExpr
+            | exprInt (MODULO|MUL|DIV) exprInt                                 # modMulDivExpr
+            | exprInt (MINUS|PLUS) exprInt                                     # plusMinusExpr
             ;
 
 exprBool :
               (TRUE | FALSE)                                                    # trueFalseExpr
             | (ENNEMI|GRAAL) IS (NORTH | SOUTH | EAST | WEST)                   # smthIsDirExpr
-            | exprEnt (SMALLER_THAN|GREATER_THAN|EQUALS_TO) exprEnt             # compExpr
+            | exprInt (SMALLER_THAN|GREATER_THAN|EQUALS_TO) exprInt             # compExpr
+            | exprBool EQUALS_TO exprBool                                       # equalBoolExpr
+            | exprCase EQUALS_TO exprCase                                       # equalCaseExpr
             | exprBool (AND|OR) exprBool                                        # andOrExpr
             | NOT exprBool                                                      # notExpr
-            | exprId                                                            # idBoolExpr
             ;
 
 exprCase :
-              (DIRT | ROCK | VINES)                                      # keyWordExpr
-            | (ZOMBIE | PLAYER | ENNEMI)                                 # keyWordExpr
-            | (MAP | RADIO | AMMO | FRUITS | SODA)                       # keyWordExpr
-            | NEARBY LB exprEnt C exprEnt RB                             # nearbyExpr
-            |exprId                                                      # idCaseExpr
+              DIRT
+            | ROCK
+            | VINES
+            | ZOMBIE
+            | PLAYER
+            | ENNEMI
+            | MAP
+            | RADIO
+            | AMMO
+            | FRUITS
+            | SODA
+            | NEARBY LB exprInt C exprInt RB
             ;
 
 exprId :
-          ID LP ((expr) (C expr)*)? RP                                     # funcCallExpr
-        | ID                                                               # idExpr
-        | ID LB expr (C expr)? RB                                          # arrayExpr
-        ;
+            ID                                  # leftExprIdentifier
+          | ID LB exprInt (C exprInt)? RB       # leftExprArrayIndex
+          ;
