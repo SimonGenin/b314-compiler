@@ -27,7 +27,7 @@ instruction:
              | IF exprBool THEN instruction+ DONE                    # ifThenDoneInstr
              | IF exprBool THEN instruction+ ELSE instruction+ DONE  # ifThenElseDoneInstr
              | WHILE exprBool DO instruction+ DONE                   # whileDoDoneInstr
-             | SET exprId TO expr                                    # setToInstr
+             | SET exprL TO expr                                     # setToInstr
              | COMPUTE expr                                          # computeInstr
              | NEXT action                                           # nextInstr
              ;
@@ -79,13 +79,10 @@ scalar:
 type: scalar | array;
 
 expr :
-         LP expr RP                                                 # parExrpr
+         LP expr RP                                                 # parExpr
        | exprInt                                                    # intExpr
        | exprBool                                                   # boolExpr
        | exprCase                                                   # caseExpr
-       | ID LB exprInt (C exprInt)? RB                              # arrayIndex
-       | ID LP ((expr) (C expr)*)? RP                               # fctCall
-       | ID                                                         # identifier
        ;
 
 exprInt :
@@ -95,6 +92,7 @@ exprInt :
             | LIFE                                                             # lifeExpr
             | exprInt (MODULO|MUL|DIV) exprInt                                 # modMulDivExpr
             | exprInt (MINUS|PLUS) exprInt                                     # plusMinusExpr
+            | exprId                                                           # idIntExpr
             ;
 
 exprBool :
@@ -105,6 +103,7 @@ exprBool :
             | exprCase EQUALS_TO exprCase                                       # equalCaseExpr
             | exprBool (AND|OR) exprBool                                        # andOrExpr
             | NOT exprBool                                                      # notExpr
+            | exprId                                                            # idBoolExpr
             ;
 
 exprCase :
@@ -120,9 +119,16 @@ exprCase :
             | FRUITS
             | SODA
             | NEARBY LB exprInt C exprInt RB
+            | exprId
             ;
 
 exprId :
-            ID                                  # leftExprIdentifier
-          | ID LB exprInt (C exprInt)? RB       # leftExprArrayIndex
+            ID LB exprInt (C exprInt)? RB                              # arrayIndex
+          | ID LP ((expr) (C expr)*)? RP                               # fctCall
+          | ID                                                         # identifier
+          ;
+
+exprL :
+            ID
+          | ID LB exprInt (C exprInt)? RB
           ;
