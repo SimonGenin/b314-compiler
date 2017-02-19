@@ -118,5 +118,5 @@ exprCase :
 exprId :
           ID LP ((expr) (C expr)*)? RP                                     # funcCallExpr
         | ID                                                               # idExpr
-        | ID LB expr (C expr)? RB                                          # casesExpr
+        | ID LB expr (C expr)? RB                                          # arrayExpr
         ;
