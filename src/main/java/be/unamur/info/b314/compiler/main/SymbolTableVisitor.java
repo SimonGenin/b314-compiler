@@ -2,7 +2,7 @@ package be.unamur.info.b314.compiler.main;
 
 import be.unamur.info.b314.compiler.B314BaseVisitor;
 import be.unamur.info.b314.compiler.B314Parser;
-import be.unamur.info.b314.compiler.exception.AlreadyUsedIdentifierException;
+import be.unamur.info.b314.compiler.symtab.ArrayType;
 import org.antlr.symtab.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 /**
  * This class builds the symbol table.
  * It is make out of symbols, types and scopes.
+ *
+ * It also checks for the use of undeclared symbols
  *
  * Created by Simon on 15/02/17.
  */
@@ -133,13 +135,13 @@ public class SymbolTableVisitor extends B314BaseVisitor
         // We create the symbol out of the context
         VariableSymbol variableSymbol = new VariableSymbol(ctx.ID().getText());
 
-        // If the symbol already exist in the current or upper scopes, we throw an exception
-        if (currentScope.resolve(ctx.ID().getText()) != null) {
-            throw new AlreadyUsedIdentifierException("SymbolTableVisitor.visitVariableDeclaration(context)");
-        }
+//        // If the symbol already exist in the current or upper scopes, we throw an exception
+//        if (currentScope.resolve(ctx.ID().getText()) != null) {
+//            throw new AlreadyUsedIdentifierException("SymbolTableVisitor.visitVariableDeclaration(context)");
+//        }
 
         // We define the scope of the new symbol to the current one.
-        variableSymbol.setScope(currentScope);
+        currentScope.define(variableSymbol);
 
         // We save the reference of the symbol for later use in the type definition
         pendingSymbol = variableSymbol;
@@ -160,7 +162,7 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
         // Creates the scoped symbol from the context, and set it in its parent scope
         FunctionSymbol functionSymbol = new FunctionSymbol(ctx.ID().getText());
-        functionSymbol.setScope(currentScope);
+        currentScope.define(functionSymbol);
 
         // Keep a track of the previous scope (parent scope)
         Scope oldScope = currentScope;
@@ -332,6 +334,8 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
         return null;
     }
+
+
 
     public SymbolTable getSymTab ()
     {
