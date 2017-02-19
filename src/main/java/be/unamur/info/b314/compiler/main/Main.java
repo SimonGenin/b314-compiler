@@ -3,6 +3,7 @@ package be.unamur.info.b314.compiler.main;
 import be.unamur.info.b314.compiler.B314Lexer;
 import be.unamur.info.b314.compiler.B314Parser;
 import be.unamur.info.b314.compiler.exception.ParsingException;
+import org.antlr.symtab.SymbolTable;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
@@ -149,6 +150,11 @@ public class Main {
         B314Parser.RootContext tree = parse(new ANTLRInputStream(new FileInputStream(inputFile)));
         LOG.debug("Parsing input: done");
         LOG.debug("AST is {}", tree.toStringTree(parser));
+
+        SymbolTableVisitor visitor = new SymbolTableVisitor();
+        tree.accept(visitor);
+
+        SymbolTable st = visitor.getSymTab();
 
     }
 

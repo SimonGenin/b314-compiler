@@ -236,3 +236,5 @@ gen/
 # Simon Main.main() compilation output (because I configured it that way)
 /programs/*.out
 
+# Simon personnal file that doesn't need sharing
+/src/main/antlr4/be/unamur/info/b314/compiler/new_grammar.txt

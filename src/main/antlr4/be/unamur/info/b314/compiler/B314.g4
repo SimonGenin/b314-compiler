@@ -69,7 +69,6 @@ localvardecl:
 
 array:
         scalar LB NUMBER (C NUMBER)? RB
-        # arrayType
         ;
 
 scalar:
@@ -78,7 +77,6 @@ scalar:
 
 
 type: scalar | array;
-
 
 expr :
          LP expr RP                                                 # parExrpr
