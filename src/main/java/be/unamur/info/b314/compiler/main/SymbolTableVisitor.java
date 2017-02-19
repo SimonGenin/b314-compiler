@@ -8,22 +8,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This class builds the symbol table.
+ * It is make out of symbols, types and scopes.
  *
  * Created by Simon on 15/02/17.
  */
 public class SymbolTableVisitor extends B314BaseVisitor
 {
 
-    // TODO when clauses scope
-
     private static final Logger LOG = LoggerFactory.getLogger(SymbolTableVisitor.class);
 
     private SymbolTable symbolTable;
-    private Scope currentScope;
 
-    private final int LOCAL = 1;
-    private final int GLOBAL = 2;
-    private int nextDecl = LOCAL;
+    private Scope currentScope;
 
     private Symbol pendingSymbol;
     private boolean isPendingSymbolAnArray = false;
@@ -38,79 +35,74 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
         symbolTable = new SymbolTable();
 
+        // TODO continue to properly rename
+
+        // Define the primitive types
         booleanType = new PrimitiveType("boolean");
         integerType = new PrimitiveType("integer");
         squareType = new PrimitiveType("square");
         voidType = new PrimitiveType("void");
 
-        VariableSymbol predefinedVar1 = new VariableSymbol("ennemi");
-        VariableSymbol predefinedVar2 = new VariableSymbol("zombie");
-        VariableSymbol predefinedVar3 = new VariableSymbol("player");
+        // Untyped symbols
+        VariableSymbol northUntypedSymbol = new VariableSymbol("north");
+        VariableSymbol southUntypedSymbol = new VariableSymbol("south");
+        VariableSymbol eastUntypedSymbol  = new VariableSymbol("east");
+        VariableSymbol westUntypedSymbol  = new VariableSymbol("west");
+        VariableSymbol graalUntypedSymbol = new VariableSymbol("graal");
+        VariableSymbol gridUntypedSymbol  = new VariableSymbol("grid");
+        VariableSymbol sizeUntypedSymbol = new VariableSymbol("size");
 
-        predefinedVar1.setType(squareType);
-        predefinedVar2.setType(squareType);
-        predefinedVar3.setType(squareType);
+        // Integer symbols
+        VariableSymbol latitudeVarInteger = new VariableSymbol("latitude");
+        VariableSymbol longitudeVarInteger = new VariableSymbol("longitude");
+        VariableSymbol lifeVarInteger = new VariableSymbol("life");
+        lifeVarInteger.setType(integerType);
+        latitudeVarInteger.setType(integerType);
+        longitudeVarInteger.setType(integerType);
 
-        VariableSymbol predefinedVar4 = new VariableSymbol("latitude");
-        VariableSymbol predefinedVar5 = new VariableSymbol("longitude");
-
-        predefinedVar4.setType(integerType);
-        predefinedVar5.setType(integerType);
-
-        // No type, these are just used symbols
-        VariableSymbol predefinedVar6 = new VariableSymbol("north");
-        VariableSymbol predefinedVar7 = new VariableSymbol("south");
-        VariableSymbol predefinedVar8 = new VariableSymbol("east");
-        VariableSymbol predefinedVar9 = new VariableSymbol("west");
-
-        VariableSymbol predefinedVar10 = new VariableSymbol("graal");
-        predefinedVar10.setType(squareType);
-
-        // TODO what to do ? Maybe not type, and just handle it using the #name
-        VariableSymbol predefinedVar11 = new VariableSymbol("grid");
-        VariableSymbol predefinedVar12 = new VariableSymbol("size");
-
-        VariableSymbol predefinedVar13 = new VariableSymbol("map");
-        VariableSymbol predefinedVar14 = new VariableSymbol("radio");
-        VariableSymbol predefinedVar15 = new VariableSymbol("ammo");
-        VariableSymbol predefinedVar16 = new VariableSymbol("fruits");
-        VariableSymbol predefinedVar17 = new VariableSymbol("life");
-
-        predefinedVar13.setType(integerType);
-        predefinedVar14.setType(integerType);
-        predefinedVar15.setType(integerType);
-        predefinedVar16.setType(integerType);
-        predefinedVar17.setType(integerType);
-
-        VariableSymbol predefinedVar18 = new VariableSymbol("dirt");
-        VariableSymbol predefinedVar19 = new VariableSymbol("rock");
-        VariableSymbol predefinedVar20 = new VariableSymbol("vines");
-
-        predefinedVar18.setType(squareType);
-        predefinedVar19.setType(squareType);
-        predefinedVar20.setType(squareType);
+        // Square symbols
+        VariableSymbol ennemiVarSquare  = new VariableSymbol("ennemi");
+        VariableSymbol zombieVarSquare  = new VariableSymbol("zombie");
+        VariableSymbol playerVarSquare  = new VariableSymbol("player");
+        VariableSymbol mapVarSquare = new VariableSymbol("map");
+        VariableSymbol radioVarSquare = new VariableSymbol("radio");
+        VariableSymbol ammoVarSquare = new VariableSymbol("ammo");
+        VariableSymbol fruitsVarSquare = new VariableSymbol("fruits");
+        VariableSymbol dirtVarSquare = new VariableSymbol("dirt");
+        VariableSymbol rockVarSquare = new VariableSymbol("rock");
+        VariableSymbol vinesVarSquare = new VariableSymbol("vines");
+        mapVarSquare.setType(squareType);
+        radioVarSquare.setType(squareType);
+        ammoVarSquare.setType(squareType);
+        fruitsVarSquare.setType(squareType);
+        dirtVarSquare.setType(squareType);
+        rockVarSquare.setType(squareType);
+        vinesVarSquare.setType(squareType);
+        ennemiVarSquare.setType(squareType);
+        zombieVarSquare.setType(squareType);
+        playerVarSquare.setType(squareType);
 
         // The predefined variables' symbols
-        symbolTable.definePredefinedSymbol(predefinedVar1);
-        symbolTable.definePredefinedSymbol(predefinedVar2);
-        symbolTable.definePredefinedSymbol(predefinedVar3);
-        symbolTable.definePredefinedSymbol(predefinedVar4);
-        symbolTable.definePredefinedSymbol(predefinedVar5);
-        symbolTable.definePredefinedSymbol(predefinedVar6);
-        symbolTable.definePredefinedSymbol(predefinedVar7);
-        symbolTable.definePredefinedSymbol(predefinedVar8);
-        symbolTable.definePredefinedSymbol(predefinedVar9);
-        symbolTable.definePredefinedSymbol(predefinedVar10);
-        symbolTable.definePredefinedSymbol(predefinedVar11);
-        symbolTable.definePredefinedSymbol(predefinedVar12);
-        symbolTable.definePredefinedSymbol(predefinedVar13);
-        symbolTable.definePredefinedSymbol(predefinedVar14);
-        symbolTable.definePredefinedSymbol(predefinedVar15);
-        symbolTable.definePredefinedSymbol(predefinedVar16);
-        symbolTable.definePredefinedSymbol(predefinedVar17);
-        symbolTable.definePredefinedSymbol(predefinedVar18);
-        symbolTable.definePredefinedSymbol(predefinedVar19);
-        symbolTable.definePredefinedSymbol(predefinedVar20);
+        symbolTable.definePredefinedSymbol(ennemiVarSquare);
+        symbolTable.definePredefinedSymbol(zombieVarSquare);
+        symbolTable.definePredefinedSymbol(playerVarSquare);
+        symbolTable.definePredefinedSymbol(latitudeVarInteger);
+        symbolTable.definePredefinedSymbol(longitudeVarInteger);
+        symbolTable.definePredefinedSymbol(northUntypedSymbol);
+        symbolTable.definePredefinedSymbol(southUntypedSymbol);
+        symbolTable.definePredefinedSymbol(eastUntypedSymbol);
+        symbolTable.definePredefinedSymbol(westUntypedSymbol);
+        symbolTable.definePredefinedSymbol(graalUntypedSymbol);
+        symbolTable.definePredefinedSymbol(gridUntypedSymbol);
+        symbolTable.definePredefinedSymbol(sizeUntypedSymbol);
+        symbolTable.definePredefinedSymbol(mapVarSquare);
+        symbolTable.definePredefinedSymbol(radioVarSquare);
+        symbolTable.definePredefinedSymbol(ammoVarSquare);
+        symbolTable.definePredefinedSymbol(fruitsVarSquare);
+        symbolTable.definePredefinedSymbol(lifeVarInteger);
+        symbolTable.definePredefinedSymbol(dirtVarSquare);
+        symbolTable.definePredefinedSymbol(rockVarSquare);
+        symbolTable.definePredefinedSymbol(vinesVarSquare);
 
         currentScope = symbolTable.GLOBALS;
 
@@ -151,7 +143,7 @@ public class SymbolTableVisitor extends B314BaseVisitor
         // Keep a track of the previous scope (parent scope)
         Scope oldScope = currentScope;
 
-        // We set the new current scope, the function one
+        // We set the new current scope: the function symbol
         currentScope = functionSymbol;
 
         // We set the type of the symbol, using the return type
