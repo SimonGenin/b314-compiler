@@ -3,6 +3,7 @@ package be.unamur.info.b314.compiler.main;
 import be.unamur.info.b314.compiler.B314BaseVisitor;
 import be.unamur.info.b314.compiler.B314Parser;
 import be.unamur.info.b314.compiler.symtab.ArrayType;
+import be.unamur.info.b314.compiler.symtab.FunctionSymbol;
 import org.antlr.symtab.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
     private Symbol pendingSymbol;
     private boolean isPendingSymbolAnArray = false;
+    private boolean isPendingSymbolAFunctionParameter = false;
 
     // primitive types
     private PrimitiveType booleanType;
@@ -133,18 +135,19 @@ public class SymbolTableVisitor extends B314BaseVisitor
         LOG.debug("[SymTab] variable name is " + ctx.ID().getText());
 
         // We create the symbol out of the context
-        VariableSymbol variableSymbol = new VariableSymbol(ctx.ID().getText());
+        Symbol symbol;
 
-//        // If the symbol already exist in the current or upper scopes, we throw an exception
-//        if (currentScope.resolve(ctx.ID().getText()) != null) {
-//            throw new AlreadyUsedIdentifierException("SymbolTableVisitor.visitVariableDeclaration(context)");
-//        }
+        if (isPendingSymbolAFunctionParameter) {
+             symbol = new ParameterSymbol(ctx.ID().getText());
+        } else {
+            symbol = new VariableSymbol(ctx.ID().getText());
+        }
 
         // We define the scope of the new symbol to the current one.
-        currentScope.define(variableSymbol);
+        currentScope.define(symbol);
 
         // We save the reference of the symbol for later use in the type definition
-        pendingSymbol = variableSymbol;
+        pendingSymbol = symbol;
 
         // We visit the type definition
         ctx.type().accept(this);
@@ -181,9 +184,11 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
         // We visit all the parameters declaration of the function, it will add
         // them to the symbol table.
+        isPendingSymbolAFunctionParameter = true;
         for (B314Parser.VardeclContext varDeclaration : ctx.vardecl()) {
             varDeclaration.accept(this);
         }
+        isPendingSymbolAFunctionParameter = false;
 
         // We visit the variables declaration.
         if (ctx.localvardecl() != null)
