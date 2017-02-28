@@ -1,0 +1,6 @@
+declare and retain
+    b as boolean;
+    s as square;
+when your turn
+when b = s do skip done
+by default do skip done

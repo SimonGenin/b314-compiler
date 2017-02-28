@@ -1,4 +1,4 @@
 declare and retain
 when your turn
-    when i = 0 do skip done
+    when b = true do skip done
 by default do skip done

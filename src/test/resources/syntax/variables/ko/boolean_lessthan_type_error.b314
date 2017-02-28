@@ -1,4 +1,5 @@
 declare and retain
+    b is boolean;
 when your turn
-    when i = 0 do skip done
+    when b < true do skip done
 by default do skip done
