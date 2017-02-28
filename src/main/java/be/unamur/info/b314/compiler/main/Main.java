@@ -11,9 +11,7 @@ import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -137,24 +135,32 @@ public class Main {
     /**
      * Compiler Methods, this is where the MAGIC happens !!! \o/
      */
-    private void compile() throws IOException, ParsingException
-    {
+    private void compile() throws Exception {
+
+        BufferedReader in = new BufferedReader(new FileReader(inputFile));
+        String line;
+        while((line = in.readLine()) != null){
+            System.out.println(line);
+        }
+        in.close();
+
+        throw new Exception();
     
-        LOG.debug("Start compilation");
-
-        /*
-         * Parse the input.
-         * Takes in an input file, returns an abstract syntax tree
-         */
-        LOG.debug("Parsing input");
-        B314Parser.RootContext tree = parse(new ANTLRInputStream(new FileInputStream(inputFile)));
-        LOG.debug("Parsing input: done");
-        LOG.debug("AST is {}", tree.toStringTree(parser));
-
-        SymbolTableVisitor visitor = new SymbolTableVisitor();
-        tree.accept(visitor);
-
-        SymbolTable st = visitor.getSymTab();
+//        LOG.debug("Start compilation");
+//
+//        /*
+//         * Parse the input.
+//         * Takes in an input file, returns an abstract syntax tree
+//         */
+//        LOG.debug("Parsing input");
+//        B314Parser.RootContext tree = parse(new ANTLRInputStream(new FileInputStream(inputFile)));
+//        LOG.debug("Parsing input: done");
+//        LOG.debug("AST is {}", tree.toStringTree(parser));
+//
+//        SymbolTableVisitor visitor = new SymbolTableVisitor();
+//        tree.accept(visitor);
+//
+//        SymbolTable st = visitor.getSymTab();
 
     }
 
