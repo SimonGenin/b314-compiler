@@ -144,7 +144,7 @@ public class Main {
         }
         in.close();
 
-        throw new Exception();
+
     
 //        LOG.debug("Start compilation");
 //
