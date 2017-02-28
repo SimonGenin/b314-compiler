@@ -135,32 +135,23 @@ public class Main {
     /**
      * Compiler Methods, this is where the MAGIC happens !!! \o/
      */
-    private void compile() throws Exception {
+    private void compile() throws IOException, ParsingException {
 
-        BufferedReader in = new BufferedReader(new FileReader(inputFile));
-        String line;
-        while((line = in.readLine()) != null){
-            System.out.println(line);
-        }
-        in.close();
+     LOG.debug("Start compilation");
 
+     /*
+      * Parse the input.
+      * Takes in an input file, returns an abstract syntax tree
+      */
+     LOG.debug("Parsing input");
+     B314Parser.RootContext tree = parse(new ANTLRInputStream(new FileInputStream(inputFile)));
+     LOG.debug("Parsing input: done");
+     LOG.debug("AST is {}", tree.toStringTree(parser));
 
-    
-//        LOG.debug("Start compilation");
-//
-//        /*
-//         * Parse the input.
-//         * Takes in an input file, returns an abstract syntax tree
-//         */
-//        LOG.debug("Parsing input");
-//        B314Parser.RootContext tree = parse(new ANTLRInputStream(new FileInputStream(inputFile)));
-//        LOG.debug("Parsing input: done");
-//        LOG.debug("AST is {}", tree.toStringTree(parser));
-//
-//        SymbolTableVisitor visitor = new SymbolTableVisitor();
-//        tree.accept(visitor);
-//
-//        SymbolTable st = visitor.getSymTab();
+     SymbolTableVisitor visitor = new SymbolTableVisitor();
+     tree.accept(visitor);
+
+     SymbolTable st = visitor.getSymTab();
 
     }
 
