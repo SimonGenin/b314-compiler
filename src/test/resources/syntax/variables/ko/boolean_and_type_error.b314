@@ -1,6 +1,0 @@
-declare and retain
-    b is boolean;
-    i is integer;
-when your turn
-    when b and i do skip done
-by default do skip done

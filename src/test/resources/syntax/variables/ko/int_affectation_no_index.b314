@@ -1,6 +1,0 @@
-declare and retain
-    i is integer;
-    tab is integer [5];
-when your turn
-    when i > 0 do set i to tab[] done
-by default do skip done
