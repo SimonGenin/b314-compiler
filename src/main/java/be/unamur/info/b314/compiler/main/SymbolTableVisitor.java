@@ -2,7 +2,9 @@ package be.unamur.info.b314.compiler.main;
 
 import be.unamur.info.b314.compiler.B314BaseVisitor;
 import be.unamur.info.b314.compiler.B314Parser;
-import be.unamur.info.b314.compiler.exception.AlreadyUsedIdentifierException;
+import be.unamur.info.b314.compiler.exception.UndeclaredSymbolException;
+import be.unamur.info.b314.compiler.symtab.ArrayType;
+import be.unamur.info.b314.compiler.symtab.FunctionSymbol;
 import org.antlr.symtab.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +12,8 @@ import org.slf4j.LoggerFactory;
 /**
  * This class builds the symbol table.
  * It is make out of symbols, types and scopes.
+ *
+ * It also checks for the use of undeclared symbols
  *
  * Created by Simon on 15/02/17.
  */
@@ -24,6 +28,7 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
     private Symbol pendingSymbol;
     private boolean isPendingSymbolAnArray = false;
+    private boolean isPendingSymbolAFunctionParameter = false;
 
     // primitive types
     private PrimitiveType booleanType;
@@ -131,18 +136,19 @@ public class SymbolTableVisitor extends B314BaseVisitor
         LOG.debug("[SymTab] variable name is " + ctx.ID().getText());
 
         // We create the symbol out of the context
-        VariableSymbol variableSymbol = new VariableSymbol(ctx.ID().getText());
+        Symbol symbol;
 
-        // If the symbol already exist in the current or upper scopes, we throw an exception
-        if (currentScope.resolve(ctx.ID().getText()) != null) {
-            throw new AlreadyUsedIdentifierException("SymbolTableVisitor.visitVariableDeclaration(context)");
+        if (isPendingSymbolAFunctionParameter) {
+             symbol = new ParameterSymbol(ctx.ID().getText());
+        } else {
+            symbol = new VariableSymbol(ctx.ID().getText());
         }
 
         // We define the scope of the new symbol to the current one.
-        variableSymbol.setScope(currentScope);
+        currentScope.define(symbol);
 
         // We save the reference of the symbol for later use in the type definition
-        pendingSymbol = variableSymbol;
+        pendingSymbol = symbol;
 
         // We visit the type definition
         ctx.type().accept(this);
@@ -160,7 +166,7 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
         // Creates the scoped symbol from the context, and set it in its parent scope
         FunctionSymbol functionSymbol = new FunctionSymbol(ctx.ID().getText());
-        functionSymbol.setScope(currentScope);
+        currentScope.define(functionSymbol);
 
         // Keep a track of the previous scope (parent scope)
         Scope oldScope = currentScope;
@@ -179,9 +185,11 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
         // We visit all the parameters declaration of the function, it will add
         // them to the symbol table.
+        isPendingSymbolAFunctionParameter = true;
         for (B314Parser.VardeclContext varDeclaration : ctx.vardecl()) {
             varDeclaration.accept(this);
         }
+        isPendingSymbolAFunctionParameter = false;
 
         // We visit the variables declaration.
         if (ctx.localvardecl() != null)
@@ -332,6 +340,23 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
         return null;
     }
+
+    @Override
+    public Object visitIdentifier (B314Parser.IdentifierContext ctx)
+    {
+
+        LOG.debug("[Decl check] Use the symbol : " + ctx.ID().getText());
+
+        // Check if a symbol as been declared
+        if (currentScope.resolve(ctx.ID().getText()) == null) {
+            throw new UndeclaredSymbolException(ctx.ID().getText());
+        }
+
+        // If no problem, we continue to the symbol
+        return super.visitIdentifier(ctx);
+    }
+
+
 
     public SymbolTable getSymTab ()
     {
