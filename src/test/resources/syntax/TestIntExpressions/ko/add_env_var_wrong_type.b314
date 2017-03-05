@@ -1,0 +1,7 @@
+declare and retain
+    x as square;
+when your turn
+by default
+    do
+        compute graal is north + 1
+    done
