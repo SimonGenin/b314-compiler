@@ -2,6 +2,7 @@ package be.unamur.info.b314.compiler.main;
 
 import be.unamur.info.b314.compiler.B314BaseVisitor;
 import be.unamur.info.b314.compiler.B314Parser;
+import be.unamur.info.b314.compiler.exception.UndeclaredSymbolException;
 import be.unamur.info.b314.compiler.symtab.ArrayType;
 import be.unamur.info.b314.compiler.symtab.FunctionSymbol;
 import org.antlr.symtab.*;
@@ -338,6 +339,21 @@ public class SymbolTableVisitor extends B314BaseVisitor
         LOG.debug("[SymTab] leave local scope");
 
         return null;
+    }
+
+    @Override
+    public Object visitIdentifier (B314Parser.IdentifierContext ctx)
+    {
+
+        LOG.debug("[Decl check] Use the symbol : " + ctx.ID().getText());
+
+        // Check if a symbol as been declared
+        if (currentScope.resolve(ctx.ID().getText()) == null) {
+            throw new UndeclaredSymbolException(ctx.ID().getText());
+        }
+
+        // If no problem, we continue to the symbol
+        return super.visitIdentifier(ctx);
     }
 
 
