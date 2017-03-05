@@ -4,6 +4,7 @@ import be.unamur.info.b314.compiler.B314BaseVisitor;
 import be.unamur.info.b314.compiler.B314Parser;
 import be.unamur.info.b314.compiler.exception.TooFewIndexesArrayException;
 import be.unamur.info.b314.compiler.exception.TooManyIndexesArrayException;
+import be.unamur.info.b314.compiler.exception.TypeMismatchException;
 import be.unamur.info.b314.compiler.exception.UndeclaredSymbolException;
 import be.unamur.info.b314.compiler.symtab.ArrayType;
 import be.unamur.info.b314.compiler.symtab.FunctionSymbol;
@@ -37,6 +38,8 @@ public class SymbolTableVisitor extends B314BaseVisitor
     private PrimitiveType integerType;
     private PrimitiveType squareType;
     private PrimitiveType voidType;
+
+    private Type lastIdentifierType;
 
     public SymbolTableVisitor () {
 
@@ -266,6 +269,7 @@ public class SymbolTableVisitor extends B314BaseVisitor
          */
 
         if (ctx.BOOLEAN() != null) {
+            LOG.debug("[SymTab] symbol type is scalar => boolean");
             if (!isArray)
                 ((TypedSymbol)pendingSymbol).setType(booleanType);
             else
@@ -273,6 +277,7 @@ public class SymbolTableVisitor extends B314BaseVisitor
         }
 
         if (ctx.INTEGER() != null) {
+            LOG.debug("[SymTab] symbol type is scalar => integer");
             if (!isArray)
                 ((TypedSymbol)pendingSymbol).setType(integerType);
             else
@@ -280,6 +285,7 @@ public class SymbolTableVisitor extends B314BaseVisitor
         }
 
         if (ctx.SQUARE() != null) {
+            LOG.debug("[SymTab] symbol type is scalar => square");
             if (!isArray)
                 ((TypedSymbol)pendingSymbol).setType(squareType);
             else
@@ -357,15 +363,13 @@ public class SymbolTableVisitor extends B314BaseVisitor
             throw new UndeclaredSymbolException(ctx.ID().getText());
         }
 
+        // Get the type for "set to" right expr checking
+        lastIdentifierType = ((TypedSymbol)symbol).getType();
+
         // If no problem, we continue to the symbol
         return super.visitIdentifier(ctx);
     }
 
-    @Override
-    public Object visitArrayIndexExprID (B314Parser.ArrayIndexExprIDContext ctx)
-    {
-        return super.visitArrayIndexExprID(ctx);
-    }
 
     @Override
     public Object visitArrayExpr (B314Parser.ArrayExprContext ctx)
@@ -392,11 +396,208 @@ public class SymbolTableVisitor extends B314BaseVisitor
             throw new TooFewIndexesArrayException(symbol.getName());
         }
 
+
+        /*
+         * We now check if the expressions have the good type if they are made of
+         * an identifier.
+         */
+
+        if (ctx.parent.parent instanceof B314Parser.ExprIntContext) {
+
+            if (!symbol.getType().getName().equals(integerType.getName() + "[]")) {
+                throw new TypeMismatchException(ctx.identifier().ID().getText());
+            }
+
+        }
+
+        if (ctx.parent.parent instanceof B314Parser.ExprCaseContext) {
+
+            if (!symbol.getType().getName().equals(squareType.getName() + "[]")) {
+                throw new TypeMismatchException(ctx.identifier().ID().getText());
+            }
+
+        }
+
+        if (ctx.parent.parent instanceof B314Parser.ExprBoolContext) {
+
+            if (!symbol.getType().getName().equals(booleanType.getName() + "[]")) {
+                throw new TypeMismatchException(ctx.identifier().ID().getText());
+            }
+
+        }
+
+
         // Everything is ok, we continue
         super.visitArrayExpr(ctx);
 
         return null;
     }
+
+    @Override
+    public Object visitSetToInstr (B314Parser.SetToInstrContext ctx)
+    {
+
+        VariableSymbol var = null;
+
+        boolean isArray = false;
+
+        if (ctx.exprL().identifier() != null) {
+            ctx.exprL().identifier().accept(this);
+            var = (VariableSymbol) currentScope.resolve(ctx.exprL().identifier().ID().getText());
+        }
+
+        if (ctx.exprL().arrayExpr() != null) {
+            isArray = true;
+            ctx.exprL().arrayExpr().accept(this);
+            var = (VariableSymbol) currentScope.resolve(ctx.exprL().arrayExpr().identifier().ID().getText());
+        }
+
+        // Get its type
+        assert var != null;
+        Type leftType = var.getType();
+
+        // Get the type of the expr on the right
+        Type rightType = null;
+        Type identifierType = null;
+
+        if (ctx.expr().exprBool() != null) {
+            rightType = booleanType;
+        }
+        else if (ctx.expr().exprInt()  != null) {
+            rightType = integerType;
+        }
+        else if (ctx.expr().exprCase() != null) {
+            rightType = squareType;
+        }
+        else {
+            lastIdentifierType = null;
+            ctx.expr().exprId().accept(this);
+            identifierType = lastIdentifierType;
+        }
+
+        // Change if it exists
+        if (identifierType != null) {
+            rightType = lastIdentifierType;
+        }
+
+        // If the types don't match, we throw an exception
+        if (!leftRightExprTypeCompare(leftType, rightType)) {
+
+            if (isArray) {
+                throw new TypeMismatchException(
+                        "Symbol " + ctx.exprL().arrayExpr().identifier().ID().getText() +
+                                " is " + leftType + " and is assigned to a " + rightType);
+            }
+
+            else {
+                throw new TypeMismatchException(
+                        "Symbol " + ctx.exprL().identifier().ID().getText() +
+                                " is " + leftType + " and is assigned to a " + rightType);
+            }
+
+        }
+
+
+
+        return null;
+    }
+
+    /**
+     * Is used when comparing an array with an element.
+     * Ex : set boolean[x] to boolean
+     * this is two different types, yet it is true.
+     *
+     * @param left the left expression
+     * @param right the right expression
+     * @return is an assignation to left alright with type right ?
+     */
+    private boolean leftRightExprTypeCompare(Type left, Type right) {
+
+        // Basic name
+        String typeName = left.getName();
+
+        // We remove the [] at the end of the name
+        if (left.getName().contains("[]")) {
+            typeName = left.getName().substring(0, left.getName().length() - 2);
+        }
+
+        return typeName.equals(right.getName());
+
+    }
+
+    @Override
+    public Object visitIdentifierExprID (B314Parser.IdentifierExprIDContext ctx)
+    {
+
+        TypedSymbol symbol = null;
+
+        if (ctx.parent instanceof B314Parser.ExprBoolContext) {
+
+            symbol = (TypedSymbol) currentScope.resolve(ctx.identifier().ID().getText());
+            if (!symbol.getType().equals(booleanType)) {
+                throw new TypeMismatchException(ctx.identifier().ID().getText());
+            }
+
+        }
+
+        if (ctx.parent instanceof B314Parser.ExprCaseContext) {
+
+            symbol = (TypedSymbol) currentScope.resolve(ctx.identifier().ID().getText());
+            if (!symbol.getType().equals(squareType)) {
+                throw new TypeMismatchException(ctx.identifier().ID().getText());
+            }
+
+        }
+
+        if (ctx.parent instanceof B314Parser.ExprIntContext) {
+
+            symbol = (TypedSymbol) currentScope.resolve(ctx.identifier().ID().getText());
+            if (!symbol.getType().equals(integerType)) {
+                throw new TypeMismatchException(ctx.identifier().ID().getText());
+            }
+
+        }
+
+        return super.visitIdentifierExprID(ctx);
+    }
+
+    @Override
+    public Object visitFctCallExprID (B314Parser.FctCallExprIDContext ctx)
+    {
+
+        TypedSymbol symbol = null;
+
+        if (ctx.parent instanceof B314Parser.ExprBoolContext) {
+
+            symbol = (TypedSymbol) currentScope.resolve(ctx.identifier().ID().getText());
+            if (!symbol.getType().equals(booleanType)) {
+                throw new TypeMismatchException(ctx.identifier().ID().getText());
+            }
+
+        }
+
+        if (ctx.parent instanceof B314Parser.ExprCaseContext) {
+
+            symbol = (TypedSymbol) currentScope.resolve(ctx.identifier().ID().getText());
+            if (!symbol.getType().equals(squareType)) {
+                throw new TypeMismatchException(ctx.identifier().ID().getText());
+            }
+
+        }
+
+        if (ctx.parent instanceof B314Parser.ExprIntContext) {
+
+            symbol = (TypedSymbol) currentScope.resolve(ctx.identifier().ID().getText());
+            if (!symbol.getType().equals(integerType)) {
+                throw new TypeMismatchException(ctx.identifier().ID().getText());
+            }
+
+        }
+
+        return super.visitFctCallExprID(ctx);
+    }
+
+
 
     public SymbolTable getSymTab ()
     {

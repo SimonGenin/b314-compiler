@@ -79,14 +79,16 @@ scalar:
 type: scalar | array;
 
 expr :
-         LP expr RP                                                 # parExpr
-       | exprInt                                                    # intExpr
-       | exprBool                                                   # boolExpr
-       | exprCase                                                   # caseExpr
+         LP expr RP
+       | exprId
+       | exprInt
+       | exprBool
+       | exprCase
        ;
 
 exprInt :
-              (MINUS)? NUMBER                                                  # integerExpr
+              LP exprInt RP                                                    # parIntExpr
+            | (MINUS)? NUMBER                                                  # integerExpr
             | (MAP | RADIO | AMMO | FRUITS | SODA) COUNT                       # itemCountExpr
             | (LATITUDE | LONGITUDE | GRID SIZE)                               # latLongGridSizeExpr
             | LIFE                                                             # lifeExpr
@@ -96,7 +98,8 @@ exprInt :
             ;
 
 exprBool :
-              (TRUE | FALSE)                                                    # trueFalseExpr
+              LP exprBool RP                                                    # parBoolExpr
+            | (TRUE | FALSE)                                                    # trueFalseExpr
             | (ENNEMI|GRAAL) IS (NORTH | SOUTH | EAST | WEST)                   # smthIsDirExpr
             | exprInt (SMALLER_THAN|GREATER_THAN|EQUALS_TO) exprInt             # compExpr
             | exprBool EQUALS_TO exprBool                                       # equalBoolExpr
@@ -107,7 +110,8 @@ exprBool :
             ;
 
 exprCase :
-              DIRT
+              LP exprCase RP
+            | DIRT
             | ROCK
             | VINES
             | ZOMBIE
@@ -123,14 +127,15 @@ exprCase :
             ;
 
 exprId :
-            arrayExpr                                            # arrayIndexExprID
+            LP exprId RP                                         # parIDExpr
+          | arrayExpr                                            # arrayIndexExprID
           | identifier LP ((expr) (C expr)*)? RP                 # fctCallExprID
           | identifier                                           # identifierExprID
           ;
 
 exprL :
-            identifier                                     # idLeftExpr
-          | arrayExpr                                      # idArrayIndexExpr
+            identifier
+          | arrayExpr
           ;
 
 arrayExpr :
