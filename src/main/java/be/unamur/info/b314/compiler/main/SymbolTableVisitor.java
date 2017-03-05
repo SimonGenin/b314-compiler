@@ -2,6 +2,8 @@ package be.unamur.info.b314.compiler.main;
 
 import be.unamur.info.b314.compiler.B314BaseVisitor;
 import be.unamur.info.b314.compiler.B314Parser;
+import be.unamur.info.b314.compiler.exception.TooFewIndexesArrayException;
+import be.unamur.info.b314.compiler.exception.TooManyIndexesArrayException;
 import be.unamur.info.b314.compiler.exception.UndeclaredSymbolException;
 import be.unamur.info.b314.compiler.symtab.ArrayType;
 import be.unamur.info.b314.compiler.symtab.FunctionSymbol;
@@ -347,8 +349,11 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
         LOG.debug("[Decl check] Use the symbol : " + ctx.ID().getText());
 
+        // Get the symbol
+        Symbol symbol = currentScope.resolve(ctx.ID().getText());
+
         // Check if a symbol as been declared
-        if (currentScope.resolve(ctx.ID().getText()) == null) {
+        if (symbol == null) {
             throw new UndeclaredSymbolException(ctx.ID().getText());
         }
 
@@ -356,7 +361,42 @@ public class SymbolTableVisitor extends B314BaseVisitor
         return super.visitIdentifier(ctx);
     }
 
+    @Override
+    public Object visitArrayIndexExprID (B314Parser.ArrayIndexExprIDContext ctx)
+    {
+        return super.visitArrayIndexExprID(ctx);
+    }
 
+    @Override
+    public Object visitArrayExpr (B314Parser.ArrayExprContext ctx)
+    {
+
+        // We first let the declaration checking kick in.
+        ctx.identifier().accept(this);
+
+        // We get the symbol back
+        VariableSymbol symbol = (VariableSymbol) currentScope.resolve(ctx.identifier().ID().getText());
+
+        LOG.debug("[Array indexes checking] " + symbol.getName());
+
+        // We get how many indexes are in the array (1 or 2)
+        int indexNumber = ((ArrayType)symbol.getType()).getIndexNumber();
+
+        // If there is two indexes when it should be one
+        if (indexNumber == 1 && ctx.exprInt(1) != null) {
+            throw new TooManyIndexesArrayException(symbol.getName());
+        }
+
+        // If there's one index when it should be two
+        if (indexNumber == 2 && ctx.exprInt(1) == null) {
+            throw new TooFewIndexesArrayException(symbol.getName());
+        }
+
+        // Everything is ok, we continue
+        super.visitArrayExpr(ctx);
+
+        return null;
+    }
 
     public SymbolTable getSymTab ()
     {

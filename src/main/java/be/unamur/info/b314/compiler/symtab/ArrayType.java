@@ -30,6 +30,17 @@ public class ArrayType implements Type
 		return toString();
 	}
 
+	/**
+	 * @return number of indexes of the symbol that has this type
+	 */
+	public int getIndexNumber() {
+
+		if (secondArg == null)
+			return 1;
+		else return 2;
+
+	}
+
 	@Override
 	public int getTypeIndex() { return -1; }
 

@@ -123,15 +123,20 @@ exprCase :
             ;
 
 exprId :
-            identifier LB exprInt (C exprInt)? RB                # arrayIndexExprID
+            arrayExpr                                            # arrayIndexExprID
           | identifier LP ((expr) (C expr)*)? RP                 # fctCallExprID
           | identifier                                           # identifierExprID
           ;
 
 exprL :
             identifier                                     # idLeftExpr
-          | identifier LB exprInt (C exprInt)? RB          # idArrayIndexExpr
+          | arrayExpr                                      # idArrayIndexExpr
           ;
+
+arrayExpr :
+             identifier LB exprInt (C exprInt)? RB
+             ;
+
 
 identifier :
               ID
