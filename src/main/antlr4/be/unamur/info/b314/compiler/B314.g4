@@ -123,12 +123,12 @@ exprCase :
             ;
 
 exprId :
-            ID LB exprInt (C exprInt)? RB                              # arrayIndex
-          | ID LP ((expr) (C expr)*)? RP                               # fctCall
-          | ID                                                         # identifier
+            ID LB exprInt (C exprInt)? RB                  # arrayIndex
+          | ID LP ((expr) (C expr)*)? RP                   # fctCall
+          | ID                                             # identifier
           ;
 
 exprL :
-            ID
-          | ID LB exprInt (C exprInt)? RB
+            ID                                     # idLeftExpr
+          | ID LB exprInt (C exprInt)? RB          # idArrayIndexExpr
           ;
