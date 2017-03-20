@@ -602,6 +602,26 @@ public class Visitor extends B314BaseVisitor
         return super.visitFctCallExprID(ctx);
     }
 
+    @Override
+    public Object visitGlobalDeclaration (B314Parser.GlobalDeclarationContext ctx)
+    {
+
+        // We start by visiting the vars
+        if (ctx.vardecl() != null) {
+            for (B314Parser.VardeclContext decl : ctx.vardecl()) {
+                decl.accept(this);
+            }
+        }
+
+        // Then we visit the functions
+        if (ctx.fctdecl() != null) {
+            for (B314Parser.FctdeclContext decl : ctx.fctdecl()) {
+                decl.accept(this);
+            }
+        }
+
+        return null;
+    }
 
     public SymbolTable getSymTab ()
     {
