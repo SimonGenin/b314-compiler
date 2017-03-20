@@ -1,4 +1,6 @@
 declare and retain
+    coucou as integer;
+    xx as integer;
     f as function(): boolean
     do
         set f to true
@@ -14,6 +16,10 @@ declare and retain
     done
 
 when your turn
+    when life < 10 do
+        set coucou to xx + 5
+        compute coucou + 3
+    done
     when life < 20 do
         next use soda
     done

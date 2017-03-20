@@ -17,13 +17,14 @@ import org.slf4j.LoggerFactory;
  * It is make out of symbols, types and scopes.
  *
  * It also checks for the use of undeclared symbols
+ * It check the types
  *
  * Created by Simon on 15/02/17.
  */
-public class SymbolTableVisitor extends B314BaseVisitor
+public class Visitor extends B314BaseVisitor
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SymbolTableVisitor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Visitor.class);
 
     private SymbolTable symbolTable;
 
@@ -41,7 +42,7 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
     private Type lastIdentifierType;
 
-    public SymbolTableVisitor () {
+    public Visitor () {
 
         LOG.debug("[SymTab] initialization");
 
@@ -596,7 +597,6 @@ public class SymbolTableVisitor extends B314BaseVisitor
 
         return super.visitFctCallExprID(ctx);
     }
-
 
 
     public SymbolTable getSymTab ()

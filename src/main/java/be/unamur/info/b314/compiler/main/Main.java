@@ -3,7 +3,6 @@ package be.unamur.info.b314.compiler.main;
 import be.unamur.info.b314.compiler.B314Lexer;
 import be.unamur.info.b314.compiler.B314Parser;
 import be.unamur.info.b314.compiler.exception.ParsingException;
-import org.antlr.symtab.SymbolTable;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
@@ -137,21 +136,24 @@ public class Main {
      */
     private void compile() throws IOException, ParsingException {
 
-     LOG.debug("Start compilation");
+        // Print the currently compiled program
+        printFile(inputFile);
 
-     /*
-      * Parse the input.
-      * Takes in an input file, returns an abstract syntax tree
-      */
-     LOG.debug("Parsing input");
-     B314Parser.RootContext tree = parse(new ANTLRInputStream(new FileInputStream(inputFile)));
-     LOG.debug("Parsing input: done");
-     LOG.debug("AST is {}", tree.toStringTree(parser));
+        LOG.debug("Start compilation");
 
-     SymbolTableVisitor visitor = new SymbolTableVisitor();
-     tree.accept(visitor);
+        /*
+         * Parse the input.
+         * Takes in an input file, returns an abstract syntax tree
+         */
 
-     SymbolTable st = visitor.getSymTab();
+        LOG.debug("Parsing input");
+
+        B314Parser.RootContext tree = parse(new ANTLRInputStream(new FileInputStream(inputFile)));
+        LOG.debug("Parsing input: done");
+        LOG.debug("AST is {}", tree.toStringTree(parser));
+
+        Visitor visitor = new Visitor();
+        tree.accept(visitor);
 
     }
 
@@ -207,6 +209,32 @@ public class Main {
         }
 
         return tree;
+
+    }
+
+    /**
+     *  Print to std output the content of a file.
+     *
+     * @param file the file to print
+     * @throws IOException if the file can't be found, or an error occurs while printing it
+     */
+    private void printFile (File file) throws IOException
+    {
+
+        LOG.debug("Printing the input file...");
+
+        System.out.println();
+        System.out.println();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        }
+
+        System.out.println();
+        System.out.println();
 
     }
 
