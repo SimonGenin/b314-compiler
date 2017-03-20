@@ -442,19 +442,19 @@ public class Visitor extends B314BaseVisitor
     public Object visitSetToInstr (B314Parser.SetToInstrContext ctx)
     {
 
-        VariableSymbol var = null;
+        TypedSymbol var = null;
 
         boolean isArray = false;
 
         if (ctx.exprL().identifier() != null) {
             ctx.exprL().identifier().accept(this);
-            var = (VariableSymbol) currentScope.resolve(ctx.exprL().identifier().ID().getText());
+            var = (TypedSymbol) currentScope.resolve(ctx.exprL().identifier().ID().getText());
         }
 
         if (ctx.exprL().arrayExpr() != null) {
             isArray = true;
             ctx.exprL().arrayExpr().accept(this);
-            var = (VariableSymbol) currentScope.resolve(ctx.exprL().arrayExpr().identifier().ID().getText());
+            var = (TypedSymbol) currentScope.resolve(ctx.exprL().arrayExpr().identifier().ID().getText());
         }
 
         // Get its type
