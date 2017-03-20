@@ -239,8 +239,5 @@ gen/
 # Simon personnal file that doesn't need sharing
 /src/main/antlr4/be/unamur/info/b314/compiler/new_grammar.txt
 
-# Can be generated with python files, so no need to share it
-/src/test/java/be/unamur/info/b314/compiler/main/
-
 # It's for personal tests
 /programs/pro1.b314
