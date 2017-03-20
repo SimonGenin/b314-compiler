@@ -2,10 +2,7 @@ package be.unamur.info.b314.compiler.main;
 
 import be.unamur.info.b314.compiler.B314BaseVisitor;
 import be.unamur.info.b314.compiler.B314Parser;
-import be.unamur.info.b314.compiler.exception.TooFewIndexesArrayException;
-import be.unamur.info.b314.compiler.exception.TooManyIndexesArrayException;
-import be.unamur.info.b314.compiler.exception.TypeMismatchException;
-import be.unamur.info.b314.compiler.exception.UndeclaredSymbolException;
+import be.unamur.info.b314.compiler.exception.*;
 import be.unamur.info.b314.compiler.symtab.ArrayType;
 import be.unamur.info.b314.compiler.symtab.FunctionSymbol;
 import org.antlr.symtab.*;
@@ -203,6 +200,10 @@ public class Visitor extends B314BaseVisitor
             ctx.localvardecl().accept(this);
         }
 
+        for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
+            instructionContext.accept(this);
+        }
+
         // We reestablish the anterior scope (we leave the function scope)
         currentScope = oldScope;
 
@@ -216,6 +217,9 @@ public class Visitor extends B314BaseVisitor
     {
 
         LOG.debug("[SymTab] symbol type is array");
+
+        if (isPendingSymbolAFunctionParameter)
+            throw new InvalidFunctionParameterArray("A function parameter can't be an array");
 
         // helper variable
         boolean severalArgs = false;
