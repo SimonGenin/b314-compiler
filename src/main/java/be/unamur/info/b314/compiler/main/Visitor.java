@@ -39,6 +39,8 @@ public class Visitor extends B314BaseVisitor
 
     private Type lastIdentifierType;
 
+    private boolean isCreatingSymbolTable;
+
     public Visitor () {
 
         LOG.debug("[SymTab] initialization");
@@ -142,7 +144,7 @@ public class Visitor extends B314BaseVisitor
         Symbol symbol;
 
         if (isPendingSymbolAFunctionParameter) {
-             symbol = new ParameterSymbol(ctx.ID().getText());
+            symbol = new ParameterSymbol(ctx.ID().getText());
         } else {
             symbol = new VariableSymbol(ctx.ID().getText());
         }
@@ -167,47 +169,68 @@ public class Visitor extends B314BaseVisitor
         LOG.debug("[SymTab] function name is " + ctx.ID().getText());
         LOG.debug("[SymTab] push function " + ctx.ID().getText() + " scope");
 
-        // Creates the scoped symbol from the context, and set it in its parent scope
-        FunctionSymbol functionSymbol = new FunctionSymbol(ctx.ID().getText());
-        currentScope.define(functionSymbol);
-
         // Keep a track of the previous scope (parent scope)
         Scope oldScope = currentScope;
 
-        // We set the new current scope: the function symbol
-        currentScope = functionSymbol;
-
-        // We set the type of the symbol, using the return type
-        if (ctx.VOID() != null) {
-            functionSymbol.setType(voidType);
-        } else {
-            // If it is a scalar, we visit to know more.
-            pendingSymbol = functionSymbol;
-            ctx.scalar().accept(this);
-        }
-
-        // We visit all the parameters declaration of the function, it will add
-        // them to the symbol table.
-        isPendingSymbolAFunctionParameter = true;
-        for (B314Parser.VardeclContext varDeclaration : ctx.vardecl()) {
-            varDeclaration.accept(this);
-        }
-        isPendingSymbolAFunctionParameter = false;
-
-        // We visit the variables declaration.
-        if (ctx.localvardecl() != null)
+        if (isCreatingSymbolTable)
         {
-            ctx.localvardecl().accept(this);
+
+            // Creates the scoped symbol from the context, and set it in its parent scope
+            FunctionSymbol functionSymbol = new FunctionSymbol(ctx.ID().getText());
+
+            // We add the symbol to the scope
+            currentScope.define(functionSymbol);
+
+            // We set the new current scope: the function symbol
+            currentScope = functionSymbol;
+
+            // We set the type of the symbol, using the return type
+            if (ctx.VOID() != null)
+            {
+                functionSymbol.setType(voidType);
+            }
+            else
+            {
+                // If it is a scalar, we visit to know more.
+                pendingSymbol = functionSymbol;
+                ctx.scalar().accept(this);
+            }
+
         }
 
-        for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
-            instructionContext.accept(this);
+        else
+        {
+            FunctionSymbol symbol = (FunctionSymbol) currentScope.getSymbol(ctx.ID().getText());
+
+            currentScope = symbol;
+
+            // We visit all the parameters declaration of the function, it will add
+            // them to the symbol table.
+            isPendingSymbolAFunctionParameter = true;
+            for (B314Parser.VardeclContext varDeclaration : ctx.vardecl())
+            {
+                varDeclaration.accept(this);
+            }
+            isPendingSymbolAFunctionParameter = false;
+
+            // We visit the variables declaration.
+            if (ctx.localvardecl() != null)
+            {
+                ctx.localvardecl().accept(this);
+            }
+
+            for (B314Parser.InstructionContext instructionContext : ctx.instruction())
+            {
+                instructionContext.accept(this);
+            }
+
+
+            LOG.debug("[SymTab] leave function " + ctx.ID().getText() + " scope");
+
         }
 
         // We reestablish the anterior scope (we leave the function scope)
         currentScope = oldScope;
-
-        LOG.debug("[SymTab] leave function " + ctx.ID().getText() + " scope");
 
         return null;
     }
@@ -371,8 +394,8 @@ public class Visitor extends B314BaseVisitor
         // Get the type for "set to" right expr checking
         lastIdentifierType = ((TypedSymbol)symbol).getType();
 
-        // If no problem, we continue to the symbol
-        return super.visitIdentifier(ctx);
+        // If no problem, we stop
+        return null;
     }
 
 
@@ -536,9 +559,19 @@ public class Visitor extends B314BaseVisitor
 
         TypedSymbol symbol = null;
 
+        /*
+         * TODO the null pointer exception shouldn't be checked here. Actually, it might be useless once decl are checked first.
+         * TODO Improve code quality
+         */
+
         if (ctx.parent instanceof B314Parser.ExprBoolContext) {
 
             symbol = (TypedSymbol) currentScope.resolve(ctx.identifier().ID().getText());
+
+            if (symbol == null) {
+                throw new UndeclaredSymbolException(ctx.identifier().ID().getText());
+            }
+
             if (!symbol.getType().equals(booleanType)) {
                 throw new TypeMismatchException(ctx.identifier().ID().getText());
             }
@@ -548,6 +581,11 @@ public class Visitor extends B314BaseVisitor
         if (ctx.parent instanceof B314Parser.ExprCaseContext) {
 
             symbol = (TypedSymbol) currentScope.resolve(ctx.identifier().ID().getText());
+
+            if (symbol == null) {
+                throw new UndeclaredSymbolException(ctx.identifier().ID().getText());
+            }
+
             if (!symbol.getType().equals(squareType)) {
                 throw new TypeMismatchException(ctx.identifier().ID().getText());
             }
@@ -557,6 +595,11 @@ public class Visitor extends B314BaseVisitor
         if (ctx.parent instanceof B314Parser.ExprIntContext) {
 
             symbol = (TypedSymbol) currentScope.resolve(ctx.identifier().ID().getText());
+
+            if (symbol == null) {
+                throw new UndeclaredSymbolException(ctx.identifier().ID().getText());
+            }
+
             if (!symbol.getType().equals(integerType)) {
                 throw new TypeMismatchException(ctx.identifier().ID().getText());
             }
@@ -572,9 +615,19 @@ public class Visitor extends B314BaseVisitor
 
         TypedSymbol symbol = null;
 
+        /*
+         * TODO the null pointer exception shouldn't be checked here. Actually, it might be useless once decl are checked first.
+         * TODO Improve code quality
+         */
+
         if (ctx.parent instanceof B314Parser.ExprBoolContext) {
 
             symbol = (TypedSymbol) currentScope.resolve(ctx.identifier().ID().getText());
+
+            if (symbol == null) {
+                throw new UndeclaredSymbolException(ctx.identifier().ID().getText());
+            }
+
             if (!symbol.getType().equals(booleanType)) {
                 throw new TypeMismatchException(ctx.identifier().ID().getText());
             }
@@ -584,6 +637,11 @@ public class Visitor extends B314BaseVisitor
         if (ctx.parent instanceof B314Parser.ExprCaseContext) {
 
             symbol = (TypedSymbol) currentScope.resolve(ctx.identifier().ID().getText());
+
+            if (symbol == null) {
+                throw new UndeclaredSymbolException(ctx.identifier().ID().getText());
+            }
+
             if (!symbol.getType().equals(squareType)) {
                 throw new TypeMismatchException(ctx.identifier().ID().getText());
             }
@@ -593,6 +651,11 @@ public class Visitor extends B314BaseVisitor
         if (ctx.parent instanceof B314Parser.ExprIntContext) {
 
             symbol = (TypedSymbol) currentScope.resolve(ctx.identifier().ID().getText());
+
+            if (symbol == null) {
+                throw new UndeclaredSymbolException(ctx.identifier().ID().getText());
+            }
+
             if (!symbol.getType().equals(integerType)) {
                 throw new TypeMismatchException(ctx.identifier().ID().getText());
             }
@@ -606,6 +669,8 @@ public class Visitor extends B314BaseVisitor
     public Object visitGlobalDeclaration (B314Parser.GlobalDeclarationContext ctx)
     {
 
+        isCreatingSymbolTable = true;
+
         // We start by visiting the vars
         if (ctx.vardecl() != null) {
             for (B314Parser.VardeclContext decl : ctx.vardecl()) {
@@ -613,7 +678,17 @@ public class Visitor extends B314BaseVisitor
             }
         }
 
-        // Then we visit the functions
+
+        // Then we visit the functions for their symbols
+        if (ctx.fctdecl() != null) {
+            for (B314Parser.FctdeclContext decl : ctx.fctdecl()) {
+                decl.accept(this);
+            }
+        }
+
+        isCreatingSymbolTable = false;
+
+        // Then we visit the functions for their bodies (and params and all)
         if (ctx.fctdecl() != null) {
             for (B314Parser.FctdeclContext decl : ctx.fctdecl()) {
                 decl.accept(this);
