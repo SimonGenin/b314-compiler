@@ -2,10 +2,12 @@ package be.unamur.info.b314.compiler.main;
 
 import be.unamur.info.b314.compiler.B314Lexer;
 import be.unamur.info.b314.compiler.B314Parser;
+import be.unamur.info.b314.compiler.PCode.PCodePrinter;
 import be.unamur.info.b314.compiler.exception.ParsingException;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,6 +157,10 @@ public class Main {
         Visitor visitor = new Visitor();
         tree.accept(visitor);
 
+        //Print PCode
+        LOG.debug("Print PCode");
+        printPCode(tree);
+        LOG.debug("Printing PCode: done");
     }
 
     // the parser
@@ -235,6 +241,22 @@ public class Main {
 
         System.out.println();
         System.out.println();
+
+    }
+
+    private void printPCode(B314Parser.RootContext tree) throws FileNotFoundException{
+        PCodePrinter printer = new PCodePrinter(outputFile);
+        PCodeVisitor visitor = new PCodeVisitor(printer);
+
+        //create environement variable
+        visitor.initEnvVar();
+        tree.accept(visitor);
+
+        //finish file out
+        visitor.endPCode();
+
+        printer.flush();
+        printer.close();
 
     }
 
