@@ -40,6 +40,26 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitDefaultClause(B314Parser.DefaultClauseContext ctx) {
 
+        //Test if we have a next action
+        //if not prin 0
+        int i =0;
+        boolean notNext=true;
+        while (ctx.instruction(i)!=null){
+            String instruction= ctx.instruction(i).getText();
+            instruction=instruction.substring(0,4);
+            if (instruction.equals("next")){
+                notNext=false;
+            }
+            i++;
+
+        }
+
+        if(notNext){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,0);
+            printer.printPrin();
+            System.out.println("Return prin 0");
+        }
+
         return super.visitDefaultClause(ctx);
     }
 
@@ -115,8 +135,6 @@ public class PCodeVisitor extends B314BaseVisitor {
         if (ctx.vardecl() != null) {
             for (B314Parser.VardeclContext decl : ctx.vardecl()) {
                 space=space+1;
-
-
             }
         }
         System.out.println("Reserve space for Global Declaration : "+space);
