@@ -39,6 +39,7 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitDefaultClause(B314Parser.DefaultClauseContext ctx) {
+
         return super.visitDefaultClause(ctx);
     }
 
@@ -94,7 +95,10 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitDoNothingAct(B314Parser.DoNothingActContext ctx) {
-        return super.visitDoNothingAct(ctx);
+
+        printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,0);
+        printer.printPrin();
+        return null;
     }
 
     @Override
@@ -316,9 +320,7 @@ public class PCodeVisitor extends B314BaseVisitor {
             printer.printRead();
             printer.printStore(PCodePrinter.PCodeTypes.Int);
         }
-        //TODO A vérifier si tjs présent
-        printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,0);
-        printer.printPrin();
+
     }
 
     public void endPCode(){
