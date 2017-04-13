@@ -40,6 +40,8 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitDefaultClause(B314Parser.DefaultClauseContext ctx) {
 
+        super.visitDefaultClause(ctx);
+
         //Test if we have a next action
         //if not prin 0
         int i =0;
@@ -60,7 +62,7 @@ public class PCodeVisitor extends B314BaseVisitor {
             System.out.println("Return prin 0");
         }
 
-        return super.visitDefaultClause(ctx);
+        return null;
     }
 
     @Override
@@ -70,12 +72,54 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitIfThenDoneInstr(B314Parser.IfThenDoneInstrContext ctx) {
-        return super.visitIfThenDoneInstr(ctx);
+
+        //Load val of bool
+        ctx.exprBool().accept(this);
+
+        //Jump if false
+        printer.printFalseJump("false");
+
+        //Do instruction
+        for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
+            instructionContext.accept(this);
+        }
+
+        printer.printDefineLabel("false");
+
+        return null;
     }
 
     @Override
     public Object visitIfThenElseDoneInstr(B314Parser.IfThenElseDoneInstrContext ctx) {
-        return super.visitIfThenElseDoneInstr(ctx);
+
+        //Load val of bool
+        ctx.exprBool().accept(this);
+
+        printer.printNot();
+
+        //Jump if false
+        printer.printFalseJump("true");
+
+        //Do instruction else
+        ctx.setinstrucion(1).accept(this);
+        //Go to the end of the if
+        printer.printUnconditionalJump("end");
+
+        //begin then
+        printer.printDefineLabel("true");
+        //Do instruction then
+        ctx.setinstrucion(0).accept(this);
+
+        //end of if
+        printer.printDefineLabel("end");
+
+        return null;
+    }
+
+    @Override
+    public Object visitSetInstruction(B314Parser.SetInstructionContext ctx) {
+        //OK
+        return super.visitSetInstruction(ctx);
     }
 
     @Override
