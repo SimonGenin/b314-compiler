@@ -252,7 +252,19 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitModMulDivExpr(B314Parser.ModMulDivExprContext ctx) {
-        return super.visitModMulDivExpr(ctx);
+        ctx.exprInt(0).accept(this);
+        ctx.exprInt(1).accept(this);
+
+        if(ctx.MODULO()!=null){
+            printer.printMod(PCodePrinter.PCodeTypes.Int);
+        }
+        if (ctx.MUL()!=null){
+            printer.printMul(PCodePrinter.PCodeTypes.Int);
+        }
+        else {
+           printer.printDiv(PCodePrinter.PCodeTypes.Int);
+       }
+        return null;
     }
 
     @Override
@@ -277,7 +289,16 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitPlusMinusExpr(B314Parser.PlusMinusExprContext ctx) {
-        return super.visitPlusMinusExpr(ctx);
+        ctx.exprInt(0).accept(this);
+        ctx.exprInt(1).accept(this);
+
+        if(ctx.PLUS()!=null){
+            printer.printAdd(PCodePrinter.PCodeTypes.Int);
+        }
+        else {
+            printer.printSub(PCodePrinter.PCodeTypes.Int);
+        }
+        return null;
     }
 
     @Override
@@ -287,6 +308,7 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitIdIntExpr(B314Parser.IdIntExprContext ctx) {
+
         return super.visitIdIntExpr(ctx);
     }
 

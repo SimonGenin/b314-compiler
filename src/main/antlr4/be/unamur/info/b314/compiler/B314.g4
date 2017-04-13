@@ -25,15 +25,16 @@ clauseDefault:
 instruction:
                SKIP_INSTR                                            # skipInstr
              | IF exprBool THEN instruction+ DONE                    # ifThenDoneInstr
-             | IF exprBool THEN setinstrucion ELSE setinstrucion DONE  # ifThenElseDoneInstr
+             | IF exprBool THEN setinstrucion ELSE setinstrucion DONE# ifThenElseDoneInstr
              | WHILE exprBool DO instruction+ DONE                   # whileDoDoneInstr
              | SET exprL TO expr                                     # setToInstr
              | COMPUTE expr                                          # computeInstr
              | NEXT action                                           # nextInstr
              ;
+
 setinstrucion:
-            instruction+                                          #setInstruction
-            ;
+                instruction+         #setInstruction
+                ;
 
 action:
           MOVE (NORTH | SOUTH | EAST | WEST)     # moveAct
