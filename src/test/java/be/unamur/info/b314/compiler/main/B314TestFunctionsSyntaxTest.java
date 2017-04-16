@@ -72,4 +72,8 @@ public class B314TestFunctionsSyntaxTest {
         CompilerTestHelper.launchCompilation("/syntax/TestFunctions/ko/wrong_type_is_return_3.b314", testFolder.newFile(), false, "TestFunctions: wrong_type_is_return_3");
     }
 
+    @Test
+    public void testTestFunctions_multiple_global_vars_and_functions_with_parameters_calling_other_functions_ok() throws Exception{
+        CompilerTestHelper.launchCompilation("/syntax/TestFunctions/ko/ok/multiple_global_vars_and_functions_with_parameters_calling_other_functions.b314", testFolder.newFile(), true, "functions: multiple_global_vars_and_functions_with_parameters_calling_other_functions");
+    }
 }

@@ -104,6 +104,7 @@ exprBool :
               LP exprBool RP                                                    # parBoolExpr
             | (TRUE | FALSE)                                                    # trueFalseExpr
             | (ENNEMI|GRAAL) IS (NORTH | SOUTH | EAST | WEST)                   # smthIsDirExpr
+            | exprId EQUALS_TO exprId                                           # equalIdExpr
             | exprInt (SMALLER_THAN|GREATER_THAN|EQUALS_TO) exprInt             # compExpr
             | exprBool EQUALS_TO exprBool                                       # equalBoolExpr
             | exprCase EQUALS_TO exprCase                                       # equalCaseExpr

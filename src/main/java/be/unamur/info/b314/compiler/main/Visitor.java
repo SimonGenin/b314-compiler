@@ -698,6 +698,21 @@ public class Visitor extends B314BaseVisitor
         return null;
     }
 
+    @Override
+    public Object visitEqualIdExpr(B314Parser.EqualIdExprContext ctx) {
+        //Check type of exprId
+        TypedSymbol var1 = (TypedSymbol) currentScope.resolve(ctx.exprId(0).getText());
+        TypedSymbol var2 = (TypedSymbol) currentScope.resolve(ctx.exprId(1).getText().substring(0,ctx.exprId(1).getText().length()-2));
+        System.out.println(ctx.exprId(1).getText());
+        //TODO Ortho
+        if (!var1.getType().equals(var2.getType())){
+            throw new TypeMismatchException(
+                    "Symbol " + ctx.exprId(0).getText() +
+                            " is " + var1 + " and is compare with symbol " + ctx.exprId(1).getText() + " is "+ var2);
+        }
+        return null;
+    }
+
     public SymbolTable getSymTab ()
     {
         return symbolTable;
