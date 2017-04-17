@@ -3,6 +3,8 @@ package be.unamur.info.b314.compiler.main;
 import be.unamur.info.b314.compiler.B314BaseVisitor;
 import be.unamur.info.b314.compiler.B314Parser;
 import be.unamur.info.b314.compiler.PCode.PCodePrinter;
+import be.unamur.info.b314.compiler.symtab.FunctionSymbol;
+import org.antlr.symtab.*;
 
 import java.io.ObjectOutputStream;
 import java.util.Map;
@@ -12,14 +14,16 @@ import java.util.Map;
  */
 public class PCodeVisitor extends B314BaseVisitor {
 
-   // private final Map<String,Integer> symTable;
+    private final SymbolTable symTable;
 
     private final PCodePrinter printer;
 
-    public PCodeVisitor(/*Map<String,Integer> symTable,*/PCodePrinter printer){
-        //this.symTable=symTable;
-        this.printer=printer;
+    private final GlobalScope scope;
 
+    public PCodeVisitor(SymbolTable symTable, PCodePrinter printer){
+        this.symTable=symTable;
+        this.printer=printer;
+        this.scope = this.symTable.GLOBALS;
     }
 
     @Override
@@ -412,5 +416,32 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     public void endPCode(){
         printer.printStop();
+    }
+
+    /**
+     * We use this function in the case where the var are not in the global scope
+     *
+     * @param nameFct Name of the current function scope
+     * @param nameVar Name of the Var that we want the PCodeTypes
+     * @return PCodeTypes of nameVar
+     */
+
+    private PCodePrinter.PCodeTypes typePCVarFct (String nameFct,String nameVar){
+
+        FunctionSymbol sym = (FunctionSymbol) this.scope.resolve(nameFct);
+
+        //Fonction scope
+        Scope fctScope = (Scope) sym.getAllSymbols().get(0).getScope();
+
+        TypedSymbol symbol =(TypedSymbol) fctScope.resolve(nameVar);
+
+
+       if (symbol.getType().toString().equals("integer")) {
+           return PCodePrinter.PCodeTypes.Int;
+       }
+        else {
+           return PCodePrinter.PCodeTypes.Bool;
+       }
+
     }
 }

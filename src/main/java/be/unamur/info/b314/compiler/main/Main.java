@@ -4,6 +4,8 @@ import be.unamur.info.b314.compiler.B314Lexer;
 import be.unamur.info.b314.compiler.B314Parser;
 import be.unamur.info.b314.compiler.PCode.PCodePrinter;
 import be.unamur.info.b314.compiler.exception.ParsingException;
+import be.unamur.info.b314.compiler.symtab.*;
+import be.unamur.info.b314.compiler.symtab.FunctionSymbol;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
@@ -11,6 +13,7 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.antlr.symtab.*;
 
 import java.io.*;
 
@@ -156,10 +159,19 @@ public class Main {
 
         Visitor visitor = new Visitor();
         tree.accept(visitor);
+        //TODO test
+        SymbolTable symtab = visitor.getSymTab();
 
+        GlobalScope scope = symtab.GLOBALS;
+        FunctionSymbol sym = (FunctionSymbol) scope.resolve("j");
+        //Scope sy = (Scope) sym.getAllSymbols().get(0).getScope();
+      //  scope.define((Symbol) sy);
+
+        System.out.println(scope.getAllNestedScopedSymbols());
+        //TODO fin test
         //Print PCode
         LOG.debug("Print PCode");
-        printPCode(tree);
+        printPCode(symtab,tree);
         LOG.debug("Printing PCode: done");
     }
 
@@ -244,9 +256,9 @@ public class Main {
 
     }
 
-    private void printPCode(B314Parser.RootContext tree) throws FileNotFoundException{
+    private void printPCode(SymbolTable symtable,B314Parser.RootContext tree) throws FileNotFoundException{
         PCodePrinter printer = new PCodePrinter(outputFile);
-        PCodeVisitor visitor = new PCodeVisitor(printer);
+        PCodeVisitor visitor = new PCodeVisitor(symtable,printer);
 
         //create environement variable
         visitor.initEnvVar();
