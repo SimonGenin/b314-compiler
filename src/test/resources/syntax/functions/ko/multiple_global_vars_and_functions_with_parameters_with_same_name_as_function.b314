@@ -1,0 +1,36 @@
+/* My comments */ 
+declare and retain 
+	b1 as boolean;
+	b2 as boolean;
+	b3 as boolean;
+    fct1 as function(x as integer):square
+    	do
+    		skip
+    	done 
+    i1 as integer; 
+	b4 as boolean;
+	b5 as boolean;
+    fct2 as function(x as integer, fct2 as boolean):integer /* parameters have same name */
+    	do
+    		skip
+    	done 
+    fct3 as function():boolean
+    	do
+    		skip
+    	done 
+	s1 as square;
+	i2 as integer; 
+	b6 as boolean;
+    i3 as integer; 
+    s2 as square;
+    fct4 as function():square
+    	do
+    		skip
+    	done 
+    fct5 as function(x as integer, y as boolean, z as square):integer
+    	do
+    		skip
+    	done 
+when your turn 
+by default 
+    do skip done

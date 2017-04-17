@@ -1,0 +1,18 @@
+/*
+
+0
+
+0,0,0
+
+0,0,0,0,0
+*/
+declare and retain 
+    x as integer;
+when your turn
+by default
+    do 
+        compute life  + 1 - (48 + 2)
+        compute life / 2 * (4 / 2)
+        compute ( ammo count + 1 - 9 ) % 5 - 2
+    done
+

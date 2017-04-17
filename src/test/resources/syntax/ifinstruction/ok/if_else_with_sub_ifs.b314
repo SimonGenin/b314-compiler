@@ -1,0 +1,23 @@
+/* My comments */ 
+declare and retain 
+    b as boolean;
+    i as integer;
+    s as square;
+when your turn
+by default
+    do 
+        if true and false or b or nearby[2, i + 1] = dirt  then 
+        	skip skip skip 
+        	if not (false and i < 5 or b) then 
+        		if true and false then skip skip done
+        	else skip skip skip done
+        else 
+        	skip compute b set b to true and false
+        	if not (false and i < 5 or b) then 
+        		set i to i + 1 skip 
+        	else 
+        		if true and false  or nearby[2, i + 1] = dirt then skip skip done 
+        	done
+        done
+    done
+

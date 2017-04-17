@@ -1,0 +1,25 @@
+/* My comments */ 
+declare and retain 
+    fct1 as function():square
+    	do
+    		skip
+    	done 
+    fct2 as function():integer
+    	do
+    		skip
+    	done 
+    fct3 as function():boolean
+    	do
+    		skip
+    	done 
+    fct1 as function():square /* Same name */
+    	do
+    		skip
+    	done 
+    fct5 as function():integer
+    	do
+    		skip
+    	done 
+when your turn 
+by default 
+    do skip done

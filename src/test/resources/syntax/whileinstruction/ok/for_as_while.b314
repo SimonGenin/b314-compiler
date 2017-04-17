@@ -1,0 +1,30 @@
+/*
+
+0
+
+0,0,0
+
+0,0,0,0,0
+*/
+declare and retain 
+    b as boolean;
+    i as integer;
+    s as square;
+    t1 as boolean[5];
+    t2 as integer[42];
+    t3 as square[42];
+when your turn
+by default
+    do 
+		set i to 0
+		
+		while i < 11 do
+			set i to i + 1
+		done
+		
+		if not i = 10 then
+        	next move west
+        done
+        
+        next do nothing
+    done

@@ -1,0 +1,9 @@
+/* My comments */ 
+declare and retain 
+    x as square;
+when your turn
+by default
+    do 
+        compute ennemi is east % 1 
+    done
+

@@ -1,0 +1,20 @@
+/* My comments */ 
+declare and retain 
+    b as boolean;
+    i as integer;
+    s as square;
+when your turn
+by default
+    do 
+        while true do skip done
+        while false do skip done
+        while graal is north do skip done
+        while graal is south do skip done
+        while graal is east do skip done
+        while graal is west do skip done
+        while ennemi is north do skip done
+        while ennemi is south do skip done
+        while ennemi is east do skip done
+        while ennemi is west do skip done
+    done
+

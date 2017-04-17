@@ -1,5 +1,0 @@
-declare and retain
-when your turn
-    when true do skip done
-    when life < 50 do skip done
-by default do skip done

@@ -1,0 +1,77 @@
+/* My comments */ 
+declare and retain 
+	b1 as boolean;
+	b2 as boolean;
+    i1 as integer; 
+    i2 as integer; 
+    v1 as boolean[5, 7];
+    v2 as integer[42];
+
+    fct2 as function(x as integer, y as boolean):integer
+    	do
+    		skip
+    	done 
+
+    fct3 as function():boolean
+    	do
+    		skip
+    	done 
+
+    fct4 as function():square
+    	do
+    		skip
+    	done 
+
+    fct5 as function(x as integer, y as boolean, z as square):integer
+    	do
+    		skip
+    	done 
+    	
+when your turn 
+
+	when true do
+		skip
+	done
+
+	when false do
+		skip
+	done
+
+	when graal is north do
+		skip
+	done
+
+	when graal is south do
+		skip
+	done
+
+	when graal is west do
+		skip
+	done
+
+	when graal is east do
+		skip
+	done
+
+	when ennemi is north do
+		skip
+	done
+
+	when ennemi is south do
+		skip
+	done
+
+	when ennemi is west do
+		skip
+	done
+
+
+	by default do 
+		skip 
+	done
+
+
+
+	when ennemi is east do
+		skip
+	done

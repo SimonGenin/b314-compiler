@@ -1,0 +1,58 @@
+/*
+
+0
+
+0,0,0
+
+0,0,0,0,0
+*/
+declare and retain 
+    b as boolean;
+    i as integer;
+    s as square;
+    t1 as boolean[5];
+    t2 as integer[6];
+    t3 as square[3];
+when your turn
+by default
+    do 
+		set b to true
+		set b to true and (not b)
+		compute b or true
+        if b then
+        	next move west
+        else 
+        	set b to true
+			set t1[0] to b
+			if t1[latitude] then
+				set b to false
+				set i to latitude
+				set t2[i + 1] to 4
+				if not i = 0 then
+					next move west
+				else
+					set t2[i + 1] to soda count + 2
+					set i to latitude + 1 * soda count
+					set s to rock
+					if i > 0 then
+						next move west
+					else 
+						set s to dirt
+					done
+					if s = rock then 
+						next move west
+					done
+		
+					set s to nearby[0,i + 1]
+					if not s = dirt then 
+						next move west
+					else 
+						next do nothing
+					done
+				done
+			else
+				next move west
+			done
+        done
+        next move west
+    done

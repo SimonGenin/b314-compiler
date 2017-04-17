@@ -1,0 +1,20 @@
+/* My comments */ 
+declare and retain 
+    b as boolean;
+    i as integer;
+    s as square;
+when your turn
+by default
+    do 
+        set b to true
+        set b to false
+        set b to graal is north
+        set b to graal is south
+        set b to graal is east
+        set b to graal is west
+        set b to ennemi is north
+        set b to ennemi is south
+        set b to ennemi is east
+        set b to ennemi is west
+    done
+

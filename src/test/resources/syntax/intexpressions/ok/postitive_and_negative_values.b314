@@ -1,0 +1,14 @@
+/* My comments */ 
+declare and retain 
+    x as integer;
+when your turn
+by default
+    do 
+        compute 5
+        compute 10
+        compute 42
+        compute 0
+        compute -5
+        compute -42
+    done
+

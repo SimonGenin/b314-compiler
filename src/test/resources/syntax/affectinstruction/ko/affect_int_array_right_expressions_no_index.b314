@@ -1,0 +1,11 @@
+/* My comments */ 
+declare and retain 
+    b as boolean;
+    i as integer[42,42];
+    s as square;
+when your turn
+by default
+    do 
+        set i[0] to 0 + 42 * 1 /* one index is missing */
+    done
+

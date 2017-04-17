@@ -1,0 +1,11 @@
+/* My comments */ 
+declare and retain 
+    v1 as boolean[0];
+    v2 as boolean[5, 7];
+    v3 as integer[42, 58];
+    v4 as integer[42];
+    v5 as square[5, 7];
+    v6 as square[5, 12];
+when your turn 
+by default 
+    do skip done

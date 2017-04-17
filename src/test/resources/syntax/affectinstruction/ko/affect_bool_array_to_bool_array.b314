@@ -1,0 +1,14 @@
+/* My comments */ 
+declare and retain 
+    b as boolean[42];
+    b2 as boolean[42, 42];
+    i as integer;
+    s as square;
+when your turn
+by default
+    do 
+        set b[0] to true and false or true
+        set b2[0] to b2[1] /* Affecting array to array */
+        set b[0] to ennemi is north and not b
+    done
+

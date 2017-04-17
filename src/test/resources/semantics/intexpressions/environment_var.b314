@@ -1,0 +1,24 @@
+/*
+
+0
+
+0,0,0
+
+0,0,0,0,0
+*/
+declare and retain 
+    x as integer;
+when your turn
+by default
+    do 
+        compute latitude
+        compute longitude
+        compute grid size
+        compute map count
+        compute radio count
+        compute ammo count
+        compute fruits count
+        compute soda count
+        compute life
+    done
+

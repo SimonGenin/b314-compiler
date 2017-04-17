@@ -1,0 +1,55 @@
+/*
+
+0
+
+0,0,0
+
+0,0,0,0,0
+*/
+declare and retain 
+    fct1 as function(x as integer):square
+    	do
+    		set fct1 to map
+    	done 
+    fct2 as function(x as integer):integer
+    	do
+    		set fct2 to x
+    	done 
+    fct3 as function(x as boolean):boolean
+    	do
+    		set fct3 to x
+    	done 
+    fct4 as function():square
+    	do
+    		set fct1 to ammo
+    	done 
+    fct5 as function():integer
+    	do
+    		set fct2 to 34
+    	done 
+when your turn 
+by default 
+    do 
+        if not fct1(5) = map then 
+    		next move north
+    	done
+    
+    	if not fct2(42) = 42 then 
+    		next move west
+    	done
+    
+        if not fct3(true) then 
+    		next move south
+    	done
+    
+        if not fct4() = ammo then 
+    		next move east
+    	done
+    	
+        if not fct5() = 34 then 
+    		next shoot east
+    	done
+        
+    	next do nothing
+    
+    done

@@ -1,0 +1,36 @@
+/*
+
+1
+
+1,2,1
+
+1,2,1,2,1
+*/
+declare and retain 
+	b1 as boolean;
+	b2 as boolean;
+    i1 as integer; 
+    i2 as integer; 
+    v1 as boolean[5, 7];
+    v2 as integer[42];
+    
+    fct1 as function():boolean
+    	do
+    		set fct1 to true 
+    	done 
+	
+when your turn 
+
+	when not b1 do
+		set b1 to true
+		next move north
+	done
+
+	when b1 do
+		set b1 to false
+		next move east
+	done
+
+	by default do 
+		next do nothing
+	done
