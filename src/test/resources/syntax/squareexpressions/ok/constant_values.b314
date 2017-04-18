@@ -1,0 +1,21 @@
+/* My comments */ 
+declare and retain 
+    b as boolean;
+    i as integer;
+    s as square;
+when your turn
+by default
+    do 
+        compute dirt
+        compute rock
+        compute vines
+        compute zombie
+        compute player
+        compute ennemi
+        compute map
+        compute radio
+        compute ammo
+        compute fruits
+        compute soda
+    done
+

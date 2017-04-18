@@ -1,0 +1,22 @@
+/* My comments */ 
+declare and retain 
+    b as boolean[42];
+    b2 as boolean[42,42];
+    i as integer;
+    s as square;
+when your turn
+by default
+    do 
+        set b[0] to true
+        set b[0] to false
+        set b[0] to graal is north
+        set b[i + 1] to graal is south
+        set b[0] to graal is east
+        set b[0] to graal is west
+        set b[i * 42] to ennemi is north
+        set b[0] to ennemi is south
+        set b[0] to ennemi is east
+        set b[0] to ennemi is west
+        set b2[0,i+1] to ennemi is west
+    done
+

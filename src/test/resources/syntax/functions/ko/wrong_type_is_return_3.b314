@@ -1,0 +1,46 @@
+/* My comments */ 
+declare and retain 
+	b1 as boolean;
+	b2 as boolean;
+	b3 as boolean;
+    fct1 as function(x as integer):integer
+    	do
+    		compute x + 1
+    		set x to x + 1 % longitude + grid size
+    		set fct1 to 1 + 5 = 6 and false /* wrong type */
+    	done 
+    i1 as integer; 
+	b4 as boolean;
+	b5 as boolean;
+    fct2 as function(x as integer, y as boolean):integer
+    	do
+    		skip
+    	done 
+    fct3 as function():boolean
+    	do
+    		set fct3 to true and false or not graal is north
+    	done 
+	s1 as square;
+	i2 as integer; 
+	b6 as boolean;
+    i3 as integer; 
+    s2 as square;
+    fct4 as function():square
+    	do
+    		skip
+    	done 
+    fct5 as function(x as integer, y as boolean, z as square):integer
+    	do
+    		if y and x = 2 then
+    			while x < 5 do
+    				set x to x + 1
+    			done
+    		else
+    			if z = ammo then
+    				next do nothing
+    			done
+    		done
+    	done 
+when your turn 
+by default 
+    do skip done

@@ -1,0 +1,18 @@
+/*
+
+6
+
+6,6,6
+
+6,6,6,6,6
+*/
+declare and retain 
+    b as boolean;
+    i as integer;
+    s as square;
+when your turn
+by default
+    do 
+        next shoot east
+    done
+

@@ -1,0 +1,20 @@
+/* My comments */ 
+declare and retain 
+    b as boolean;
+    i as integer;
+    s as square;
+when your turn
+by default
+    do 
+        if true then skip else skip done
+        if false then skip else skip done
+        if graal is north then skip else skip done
+        if graal is south then skip else skip done
+        if graal is east then skip else skip done
+        if graal is west then skip else skip done
+        if ennemi is north then skip else skip done
+        if ennemi is south then skip else skip done
+        if ennemi is east then skip else skip done
+        if ennemi is west then skip else skip done
+    done
+

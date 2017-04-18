@@ -1,0 +1,8 @@
+/* My comments */ 
+declare and retain 
+    v1 as integer[5];
+    v2 as boolean[5,-7];
+    v6 as square[5, 12];
+when your turn 
+by default 
+    do skip done

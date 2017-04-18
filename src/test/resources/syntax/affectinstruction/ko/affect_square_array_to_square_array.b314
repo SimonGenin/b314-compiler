@@ -1,0 +1,13 @@
+/* My comments */ 
+declare and retain 
+    b as boolean;
+    i as integer;
+    s as square[42];
+    s2 as square[42,42];
+when your turn
+by default
+    do 
+        set s[0] to nearby[i + 2 - 4 * 9 % latitude,2 + 42 * i]
+        set s2[0] to s /* Affecting array to array */
+    done
+

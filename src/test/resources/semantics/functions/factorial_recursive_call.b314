@@ -1,0 +1,27 @@
+/*
+
+0
+
+0,0,0
+
+0,0,0,0,0
+*/
+declare and retain 
+	facto as function(x as integer):integer
+    	do
+    		if x < 0 or x = 0 then
+    			set facto to 1
+    		else 
+    			set facto to x * facto(x - 1)
+    		done
+    	done
+    i3 as integer; 
+when your turn 
+by default 
+    do
+    	set i3 to facto(5)
+    	if not i3 =  5 * 4 * 3 * 2 then 
+    		next move west
+    	done
+    	next do nothing
+    done

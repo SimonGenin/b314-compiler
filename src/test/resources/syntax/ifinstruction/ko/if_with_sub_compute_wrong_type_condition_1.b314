@@ -1,0 +1,20 @@
+/* My comments */ 
+declare and retain 
+    b as boolean;
+    i as integer;
+    s as square;
+when your turn
+by default
+    do 
+        if graal is north and b  or nearby[2, i + 1] = dirt then 
+        	if ammo = ammo then 
+				skip 
+				compute s + 2 /* Wrong type */
+				set b to true and false 
+			done
+			if not (false and i < 5 or b) then 
+				set i to i + 1 skip 
+			done
+        done
+    done
+

@@ -1,0 +1,17 @@
+/* My comments */ 
+declare and retain 
+    b as boolean;
+    i as integer;
+    s as square;
+when your turn
+by default
+    do 
+        set b to true
+        set b to false
+        set s to graal is north /* wrong type */
+        set i to latitude
+        set s to fruits
+        set s to soda
+        set s to nearby[2,2]
+    done
+

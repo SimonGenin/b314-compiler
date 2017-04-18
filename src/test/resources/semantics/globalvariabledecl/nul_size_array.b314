@@ -1,0 +1,14 @@
+/*
+
+0
+
+0,0,0
+
+0,0,0,0,0
+*/
+declare and retain 
+    v1 as boolean[0];
+    v2 as boolean[5, 7];
+when your turn 
+by default 
+    do skip done

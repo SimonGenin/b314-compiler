@@ -1,0 +1,22 @@
+/* My comments */ 
+declare and retain 
+    b as boolean;
+    i as integer;
+    s as square;
+when your turn
+by default
+    do 
+        set s to dirt
+        set s to rock
+        set s to vines
+        set s to zombie
+        set s to player
+        set s to ennemi
+        set s to map
+        set s to radio
+        set s to ammo
+        set s to fruits
+        set s to soda
+        set s to nearby[2, 2]
+    done
+

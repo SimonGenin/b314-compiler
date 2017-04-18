@@ -1,0 +1,27 @@
+/*
+
+1
+
+1,2,3
+
+1,2,3,4,5
+*/
+declare and retain 
+    b as boolean;
+    i as integer;
+    s as square;
+    t1 as boolean[5];
+    t2 as integer[42];
+    t3 as square[42];
+when your turn
+by default
+    do 
+		set i to i + 1
+		if i = 0 then next do nothing	done
+		if i = 1 then next move north done
+		if i = 2 then next move east done
+		if i = 3 then next move south done		
+		if i = 4 then next move west done
+		if i = 5 then next shoot north done
+		next do nothing
+    done

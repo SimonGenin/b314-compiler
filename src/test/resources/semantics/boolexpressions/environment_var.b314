@@ -1,0 +1,23 @@
+/*
+
+0
+
+0,0,0
+
+0,0,0,0,0
+*/
+declare and retain 
+    x as integer;
+when your turn
+by default
+    do 
+        compute ennemi is north
+        compute ennemi is south
+        compute ennemi is east
+        compute ennemi is west
+        compute graal is north
+        compute graal is south
+        compute graal is east
+        compute graal is west
+    done
+

@@ -1,0 +1,17 @@
+/*
+
+0
+
+0,0,0
+
+0,0,0,0,0
+*/
+declare and retain 
+    x as boolean;
+when your turn
+by default
+    do 
+        compute true
+        compute false
+    done
+
