@@ -134,7 +134,26 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitWhileDoDoneInstr(B314Parser.WhileDoDoneInstrContext ctx) {
-        return super.visitWhileDoDoneInstr(ctx);
+
+        //Come back after intruction in the loop
+        printer.printDefineLabel("back_while_test");
+
+        //Load val of bool
+        ctx.exprBool().accept(this);
+
+        //Jump if false
+        printer.printFalseJump("Go_out_loop");
+
+        //Do instruction
+        for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
+            instructionContext.accept(this);
+        }
+        //Go to test
+        printer.printUnconditionalJump("back_while_test");
+
+        printer.printDefineLabel("Go_out_loop");
+
+        return null;
     }
 
     @Override
