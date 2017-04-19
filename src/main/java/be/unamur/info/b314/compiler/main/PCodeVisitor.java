@@ -20,6 +20,8 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     private final GlobalScope scope;
 
+    private Scope currentScope;
+
     public PCodeVisitor(SymbolTable symTable, PCodePrinter printer){
         this.symTable=symTable;
         this.printer=printer;
@@ -28,6 +30,10 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitRoot(B314Parser.RootContext ctx) {
+        currentScope=this.scope;
+
+        //TODo test
+        this.typePCVarFct("fct5","b1");
         return super.visitRoot(ctx);
     }
 
@@ -67,11 +73,6 @@ public class PCodeVisitor extends B314BaseVisitor {
         }
 
         return null;
-    }
-
-    @Override
-    public Object visitSkipInstr(B314Parser.SkipInstrContext ctx) {
-        return super.visitSkipInstr(ctx);
     }
 
     @Override
@@ -120,11 +121,6 @@ public class PCodeVisitor extends B314BaseVisitor {
         return null;
     }
 
-    @Override
-    public Object visitSetInstruction(B314Parser.SetInstructionContext ctx) {
-        //OK
-        return super.visitSetInstruction(ctx);
-    }
 
     @Override
     public Object visitComputeInstr(B314Parser.ComputeInstrContext ctx) {
@@ -171,7 +167,47 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitFunctionDeclaration(B314Parser.FunctionDeclarationContext ctx) {
-        return super.visitFunctionDeclaration(ctx);
+
+        //Save currentScope
+        Scope oldScope =currentScope;
+
+        //Load FunctionScope
+        String id = ctx.ID().getText();
+        currentScope = this.getFunctionScope(id);
+
+        //Define label with the id of the function
+        printer.printDefineLabel(id);
+
+        //Create SetStackPointer
+        if (currentScope.equals(oldScope)){
+            printer.printSetStackPointer(5);
+        }
+        else {
+            printer.printSetStackPointer(5+currentScope.getAllSymbols().size());
+
+        }
+
+        for (B314Parser.VardeclContext vardeclContext : ctx.vardecl()) {
+          //TODO gérer le chargement des param
+        }
+
+        //Do all the instruction
+        for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
+            instructionContext.accept(this);
+        }
+
+        //Return to call function
+        if (ctx.VOID()!=null) {
+            printer.printReturnFromProcedure();
+        }
+        else{
+            printer.printReturnFromFunction();
+        }
+
+        //Load the oldScope
+        currentScope =oldScope;
+
+        return null;
     }
 
     @Override
@@ -383,7 +419,18 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitFctCallExprID(B314Parser.FctCallExprIDContext ctx) {
-        return super.visitFctCallExprID(ctx);
+
+
+        printer.printMarkStack(0);//TODO vérifier diff prof
+
+        //Load all param
+        for (B314Parser.ExprContext exprContext : ctx.expr()) {
+            exprContext.accept(this);
+        }
+
+        //call fct
+        printer.printCallUserProcedure(ctx.expr().size(),ctx.identifier().getText());
+        return null;
     }
 
     @Override
@@ -435,8 +482,11 @@ public class PCodeVisitor extends B314BaseVisitor {
         //Fonction scope
         Scope fctScope = (Scope) sym.getAllSymbols().get(0).getScope();
 
+        System.out.println("test"+fctScope);
+
         TypedSymbol symbol =(TypedSymbol) fctScope.resolve(nameVar);
 
+        System.out.println("test"+symbol);
 
        if (symbol.getType().toString().equals("integer")) {
            return PCodePrinter.PCodeTypes.Int;
@@ -444,6 +494,26 @@ public class PCodeVisitor extends B314BaseVisitor {
         else {
            return PCodePrinter.PCodeTypes.Bool;
        }
+
+    }
+
+    /**
+     *
+     * @param nameFct Name of the function
+     * @return Scope of  the function
+     */
+    private Scope getFunctionScope(String nameFct){
+        FunctionSymbol sym = (FunctionSymbol) this.scope.resolve(nameFct);
+
+
+        try {
+            Scope fctScope = (Scope) sym.getAllSymbols().get(0).getScope();
+            return fctScope;//Return function scope
+        }
+        catch (Exception e){
+            return currentScope;//If there are not elem in the scope we return the currentScope
+        }
+
 
     }
 }
