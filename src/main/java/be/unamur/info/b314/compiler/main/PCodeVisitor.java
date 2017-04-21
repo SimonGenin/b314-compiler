@@ -337,13 +337,30 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitItemCountExpr(B314Parser.ItemCountExprContext ctx) {
-        //TODO définir les position dans les valeur d'entrée
-        return super.visitItemCountExpr(ctx);
+
+        //Load Value
+        if(ctx.MAP()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 3);
+        }
+        if(ctx.RADIO()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 4);
+        }
+        if(ctx.AMMO()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 5);
+        }
+        if(ctx.FRUITS()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 6);
+        }
+        if(ctx.SODA()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 7);
+        }
+        return null;
     }
 
     @Override
     public Object visitLifeExpr(B314Parser.LifeExprContext ctx) {
-        return super.visitLifeExpr(ctx);
+        printer.printLoad(PCodePrinter.PCodeTypes.Int,0,8);
+        return null;
     }
 
     //TODO remettre
@@ -364,7 +381,19 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitLatLongGridSizeExpr(B314Parser.LatLongGridSizeExprContext ctx) {
-        return super.visitLatLongGridSizeExpr(ctx);
+
+        //Load Value
+        if(ctx.LATITUDE()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 0);
+        }
+        if(ctx.LONGITUDE()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 1);
+        }
+        if(ctx.GRID()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 2);
+        }
+
+        return null ;
     }
 
     @Override
@@ -442,7 +471,37 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitSmthIsDirExpr(B314Parser.SmthIsDirExprContext ctx) {
-        return super.visitSmthIsDirExpr(ctx);
+
+        //Load Value
+        if(ctx.ENNEMI()!=null){
+            if(ctx.NORTH()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,9);
+            }
+            if(ctx.EAST()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,10);
+            }
+            if(ctx.SOUTH()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,11);
+            }
+            if(ctx.WEST()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,12);
+            }
+        }
+        else {
+            if(ctx.NORTH()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,13);
+            }
+            if(ctx.EAST()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,14);
+            }
+            if(ctx.SOUTH()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,15);
+            }
+            if(ctx.WEST()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,16);
+            }
+        }
+        return null;
     }
 
     @Override
@@ -496,7 +555,58 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitExprCase(B314Parser.ExprCaseContext ctx) {
-        return super.visitExprCase(ctx);
+
+        //Load Value
+        if(ctx.exprCase()!=null){
+            ctx.exprCase().accept(this);
+        }
+        else{
+            if(ctx.DIRT()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,0);
+            }
+            if(ctx.ROCK()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,1);
+            }
+            if(ctx.VINES()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,2);
+            }
+            if(ctx.ZOMBIE()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,3);
+            }
+            if(ctx.PLAYER()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,4);
+            }
+            if(ctx.ENNEMI()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,5);
+            }
+            if(ctx.MAP()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,6);
+            }
+            if(ctx.RADIO()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,7);
+            }
+            if(ctx.AMMO()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,8);
+            }
+            if(ctx.FRUITS()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,9);
+            }
+            if(ctx.SODA()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,10);
+            }
+            if(ctx.NEARBY()!=null){
+                int x = Integer.parseInt(ctx.exprInt(0).getText()); // Get x
+                int y = Integer.parseInt(ctx.exprInt(1).getText()); // Get y
+
+                int address = 17+ x*9+y;
+
+                printer.printLoad(PCodePrinter.PCodeTypes.Int,0,address);
+            }
+            if (ctx.exprId()!=null){
+                ctx.exprId().accept(this);
+            }
+        }
+        return null;
     }
 
     @Override
