@@ -375,12 +375,49 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitEqualBoolExpr(B314Parser.EqualBoolExprContext ctx) {
-        return super.visitEqualBoolExpr(ctx);
+
+        //Load Values
+        ctx.exprBool(0).accept(this);
+        ctx.exprBool(1).accept(this);
+
+        printer.printEqualsValues(PCodePrinter.PCodeTypes.Bool);
+
+        return null;
+    }
+
+    @Override
+    public Object visitEqualIdExpr(B314Parser.EqualIdExprContext ctx) {
+
+        //Load Values
+        ctx.exprId(0).accept(this);
+        ctx.exprId(1).accept(this);
+
+        //TODO est ce qu on peut comparer 2 tab ?
+
+        TypedSymbol symbol =(TypedSymbol) currentScope.resolve(ctx.exprId(0).getText());
+
+        //Test type of var and print equal
+        if(symbol.getType().equals("integer")){
+            printer.printEqualsValues(PCodePrinter.PCodeTypes.Int);
+        }
+        else {
+            printer.printEqualsValues(PCodePrinter.PCodeTypes.Bool);
+        }
+
+
+        return null;
     }
 
     @Override
     public Object visitNotExpr(B314Parser.NotExprContext ctx) {
-        return super.visitNotExpr(ctx);
+
+        //Load value
+        ctx.exprBool().accept(this);
+
+        //Not value
+        printer.printNot();
+
+        return null;
     }
 
     @Override
@@ -390,7 +427,17 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitEqualCaseExpr(B314Parser.EqualCaseExprContext ctx) {
-        return super.visitEqualCaseExpr(ctx);
+
+
+        //TODO Voir comment le type es défini en mem pour le test egualité
+        //Load Values
+        ctx.exprCase(0).accept(this);
+        ctx.exprCase(1).accept(this);
+
+       // printer.printEqualsValues();
+
+
+        return null;
     }
 
     @Override
@@ -400,7 +447,21 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitCompExpr(B314Parser.CompExprContext ctx) {
-        return super.visitCompExpr(ctx);
+
+        //Load Values
+        ctx.exprInt(0).accept(this);
+        ctx.exprInt(1).accept(this);
+
+        if(ctx.EQUALS_TO()!=null){
+            printer.printEqualsValues(PCodePrinter.PCodeTypes.Int);
+        }
+        if (ctx.GREATER_THAN()!=null){
+            printer.printGreather(PCodePrinter.PCodeTypes.Int);
+        }
+        if (ctx.SMALLER_THAN()!=null){
+            printer.printLess(PCodePrinter.PCodeTypes.Int);
+        }
+        return null;
     }
 
     @Override
