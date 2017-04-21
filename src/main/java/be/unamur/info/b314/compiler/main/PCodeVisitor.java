@@ -31,9 +31,6 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitRoot(B314Parser.RootContext ctx) {
         currentScope=this.scope;
-
-        //TODo test
-        this.typePCVarFct("fct5","b1");
         return super.visitRoot(ctx);
     }
 
@@ -309,7 +306,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         return super.visitExpr(ctx);
     }
     //TODO remettre
-    /*
+
     @Override
     public Object visitModMulDivExpr(B314Parser.ModMulDivExprContext ctx) {
         //Load Value
@@ -326,7 +323,7 @@ public class PCodeVisitor extends B314BaseVisitor {
            printer.printDiv(PCodePrinter.PCodeTypes.Int);
        }
         return null;
-    }*/
+    }
 
     @Override
     public Object visitIntegerExpr(B314Parser.IntegerExprContext ctx) {
@@ -350,7 +347,7 @@ public class PCodeVisitor extends B314BaseVisitor {
     }
 
     //TODO remettre
-   /* @Override
+    @Override
     public Object visitPlusMinusExpr(B314Parser.PlusMinusExprContext ctx) {
         //Load value
         ctx.exprInt(0).accept(this);
@@ -363,7 +360,7 @@ public class PCodeVisitor extends B314BaseVisitor {
             printer.printSub(PCodePrinter.PCodeTypes.Int);
         }
         return null;
-    }*/
+    }
 
     @Override
     public Object visitLatLongGridSizeExpr(B314Parser.LatLongGridSizeExprContext ctx) {
@@ -408,17 +405,32 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitTrueFalseExpr(B314Parser.TrueFalseExprContext ctx) {
-        return super.visitTrueFalseExpr(ctx);
+
+        if(ctx.TRUE()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Bool,1);
+        }
+        else {
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Bool,0);
+        }
+
+        return null;
     }
 
-    @Override
-    public Object visitParBoolExpr(B314Parser.ParBoolExprContext ctx) {
-        return super.visitParBoolExpr(ctx);
-    }
 
     @Override
     public Object visitAndOrExpr(B314Parser.AndOrExprContext ctx) {
-        return super.visitAndOrExpr(ctx);
+
+        //Load value
+        ctx.exprBool(0).accept(this);
+        ctx.exprBool(1).accept(this);
+        if (ctx.OR()!=null) {
+            printer.printOr();
+        }
+        else {
+            printer.printAnd();
+        }
+
+        return null;
     }
 
     @Override
