@@ -10,8 +10,8 @@ public class ArrayType implements Type
 {
 
 	protected Type elemType;
-	protected final Integer firstArg;
-	protected final Integer secondArg;
+	public final Integer firstArg;
+	public final Integer secondArg;
 
 	public ArrayType(Integer numFirstArg, Integer numSecondArg)
 	{
