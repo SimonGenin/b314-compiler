@@ -290,13 +290,6 @@ public class PCodeVisitor extends B314BaseVisitor {
 
         if (ctx.NUMBER(1)!=null){
             number = number*Integer.parseInt(ctx.NUMBER(1).getText());
-            if (scalar.equals("square")){
-                number =number*2;
-            }
-        }
-
-        if (scalar.equals("square")){
-            number =number*2;
         }
 
         // Reserve space for array
@@ -306,17 +299,6 @@ public class PCodeVisitor extends B314BaseVisitor {
         return null;
     }
 
-    @Override
-    public Object visitType(B314Parser.TypeContext ctx) {
-        return super.visitType(ctx);
-    }
-
-
-    @Override
-    public Object visitExpr(B314Parser.ExprContext ctx) {
-        return super.visitExpr(ctx);
-    }
-    //TODO remettre
 
     @Override
     public Object visitModMulDivExpr(B314Parser.ModMulDivExprContext ctx) {
@@ -653,7 +635,7 @@ public class PCodeVisitor extends B314BaseVisitor {
 
 
         printer.printLoad(this.getPCodeTypes(ctx.getText()),0,this.getVarIndex(ctx.getText()));
-        return super.visitIdentifierExprID(ctx);
+        return null;
     }
 
     @Override
@@ -663,6 +645,10 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitArrayExpr(B314Parser.ArrayExprContext ctx) {
+        //TODO Vérifier
+
+
+
         return super.visitArrayExpr(ctx);
     }
 
