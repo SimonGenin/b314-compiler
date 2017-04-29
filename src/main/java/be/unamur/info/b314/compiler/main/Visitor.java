@@ -330,8 +330,12 @@ public class Visitor extends B314BaseVisitor
         LOG.debug("[SymTab] visit when clause");
         LOG.debug("[SymTab] define new local scope");
 
+
+
         // Define a new local scope to the when structure
         LocalScope localScope = new LocalScope(currentScope);
+
+
 
         // Save the old scope
         Scope oldScope = currentScope;
@@ -341,6 +345,12 @@ public class Visitor extends B314BaseVisitor
 
         // visit normally all children
         super.visitWhenClause(ctx);
+
+        //TODO test
+        /*System.out.println("test "+currentScope.resolve("b1"));
+        FieldSymbol f =new FieldSymbol()
+        System.out.println(s);*/
+
 
         // We exit the when structure, so we put back the old scope
         currentScope = oldScope;
@@ -362,6 +372,7 @@ public class Visitor extends B314BaseVisitor
 
         // Save the old scope
         Scope oldScope = currentScope;
+
 
         // Set the new scope
         currentScope = localScope;
@@ -703,7 +714,7 @@ public class Visitor extends B314BaseVisitor
         //Check type of exprId
         TypedSymbol var1 = (TypedSymbol) currentScope.resolve(ctx.exprId(0).getText());
         TypedSymbol var2 = (TypedSymbol) currentScope.resolve(ctx.exprId(1).getText().substring(0,ctx.exprId(1).getText().length()-2));
-        System.out.println(ctx.exprId(1).getText());
+
         //TODO Ortho
         if (!var1.getType().equals(var2.getType())){
             throw new TypeMismatchException(

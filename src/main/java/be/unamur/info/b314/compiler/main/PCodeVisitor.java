@@ -3,6 +3,8 @@ package be.unamur.info.b314.compiler.main;
 import be.unamur.info.b314.compiler.B314BaseVisitor;
 import be.unamur.info.b314.compiler.B314Parser;
 import be.unamur.info.b314.compiler.PCode.PCodePrinter;
+import be.unamur.info.b314.compiler.symtab.FunctionSymbol;
+import org.antlr.symtab.*;
 
 import java.io.ObjectOutputStream;
 import java.util.Map;
@@ -12,18 +14,23 @@ import java.util.Map;
  */
 public class PCodeVisitor extends B314BaseVisitor {
 
-   // private final Map<String,Integer> symTable;
+    private final SymbolTable symTable;
 
     private final PCodePrinter printer;
 
-    public PCodeVisitor(/*Map<String,Integer> symTable,*/PCodePrinter printer){
-        //this.symTable=symTable;
-        this.printer=printer;
+    private final GlobalScope scope;
 
+    private Scope currentScope;
+
+    public PCodeVisitor(SymbolTable symTable, PCodePrinter printer){
+        this.symTable=symTable;
+        this.printer=printer;
+        this.scope = this.symTable.GLOBALS;
     }
 
     @Override
     public Object visitRoot(B314Parser.RootContext ctx) {
+        currentScope=this.scope;
         return super.visitRoot(ctx);
     }
 
@@ -63,11 +70,6 @@ public class PCodeVisitor extends B314BaseVisitor {
         }
 
         return null;
-    }
-
-    @Override
-    public Object visitSkipInstr(B314Parser.SkipInstrContext ctx) {
-        return super.visitSkipInstr(ctx);
     }
 
     @Override
@@ -116,11 +118,6 @@ public class PCodeVisitor extends B314BaseVisitor {
         return null;
     }
 
-    @Override
-    public Object visitSetInstruction(B314Parser.SetInstructionContext ctx) {
-        //OK
-        return super.visitSetInstruction(ctx);
-    }
 
     @Override
     public Object visitComputeInstr(B314Parser.ComputeInstrContext ctx) {
@@ -134,7 +131,26 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitWhileDoDoneInstr(B314Parser.WhileDoDoneInstrContext ctx) {
-        return super.visitWhileDoDoneInstr(ctx);
+
+        //Come back after intruction in the loop
+        printer.printDefineLabel("back_while_test");
+
+        //Load val of bool
+        ctx.exprBool().accept(this);
+
+        //Jump if false
+        printer.printFalseJump("Go_out_loop");
+
+        //Do instruction
+        for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
+            instructionContext.accept(this);
+        }
+        //Go to test
+        printer.printUnconditionalJump("back_while_test");
+
+        printer.printDefineLabel("Go_out_loop");
+
+        return null;
     }
 
     @Override
@@ -167,7 +183,47 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitFunctionDeclaration(B314Parser.FunctionDeclarationContext ctx) {
-        return super.visitFunctionDeclaration(ctx);
+
+        //Save currentScope
+        Scope oldScope =currentScope;
+
+        //Load FunctionScope
+        String id = ctx.ID().getText();
+        currentScope = this.getFunctionScope(id);
+
+        //Define label with the id of the function
+        printer.printDefineLabel(id);
+
+        //Create SetStackPointer
+        if (currentScope.equals(oldScope)){
+            printer.printSetStackPointer(5);
+        }
+        else {
+            printer.printSetStackPointer(5+currentScope.getAllSymbols().size());
+
+        }
+
+        for (B314Parser.VardeclContext vardeclContext : ctx.vardecl()) {
+          //TODO gérer le chargement des param
+        }
+
+        //Do all the instruction
+        for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
+            instructionContext.accept(this);
+        }
+
+        //Return to call function
+        if (ctx.VOID()!=null) {
+            printer.printReturnFromProcedure();
+        }
+        else{
+            printer.printReturnFromFunction();
+        }
+
+        //Load the oldScope
+        currentScope =oldScope;
+
+        return null;
     }
 
     @Override
@@ -250,7 +306,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         return super.visitExpr(ctx);
     }
     //TODO remettre
-    /*
+
     @Override
     public Object visitModMulDivExpr(B314Parser.ModMulDivExprContext ctx) {
         //Load Value
@@ -267,7 +323,7 @@ public class PCodeVisitor extends B314BaseVisitor {
            printer.printDiv(PCodePrinter.PCodeTypes.Int);
        }
         return null;
-    }*/
+    }
 
     @Override
     public Object visitIntegerExpr(B314Parser.IntegerExprContext ctx) {
@@ -281,17 +337,34 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitItemCountExpr(B314Parser.ItemCountExprContext ctx) {
-        //TODO définir les position dans les valeur d'entrée
-        return super.visitItemCountExpr(ctx);
+
+        //Load Value
+        if(ctx.MAP()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 3);
+        }
+        if(ctx.RADIO()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 4);
+        }
+        if(ctx.AMMO()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 5);
+        }
+        if(ctx.FRUITS()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 6);
+        }
+        if(ctx.SODA()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 7);
+        }
+        return null;
     }
 
     @Override
     public Object visitLifeExpr(B314Parser.LifeExprContext ctx) {
-        return super.visitLifeExpr(ctx);
+        printer.printLoad(PCodePrinter.PCodeTypes.Int,0,8);
+        return null;
     }
 
     //TODO remettre
-   /* @Override
+    @Override
     public Object visitPlusMinusExpr(B314Parser.PlusMinusExprContext ctx) {
         //Load value
         ctx.exprInt(0).accept(this);
@@ -304,11 +377,23 @@ public class PCodeVisitor extends B314BaseVisitor {
             printer.printSub(PCodePrinter.PCodeTypes.Int);
         }
         return null;
-    }*/
+    }
 
     @Override
     public Object visitLatLongGridSizeExpr(B314Parser.LatLongGridSizeExprContext ctx) {
-        return super.visitLatLongGridSizeExpr(ctx);
+
+        //Load Value
+        if(ctx.LATITUDE()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 0);
+        }
+        if(ctx.LONGITUDE()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 1);
+        }
+        if(ctx.GRID()!=null) {
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 2);
+        }
+
+        return null ;
     }
 
     @Override
@@ -319,12 +404,49 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitEqualBoolExpr(B314Parser.EqualBoolExprContext ctx) {
-        return super.visitEqualBoolExpr(ctx);
+
+        //Load Values
+        ctx.exprBool(0).accept(this);
+        ctx.exprBool(1).accept(this);
+
+        printer.printEqualsValues(PCodePrinter.PCodeTypes.Bool);
+
+        return null;
+    }
+
+    @Override
+    public Object visitEqualIdExpr(B314Parser.EqualIdExprContext ctx) {
+
+        //Load Values
+        ctx.exprId(0).accept(this);
+        ctx.exprId(1).accept(this);
+
+        //TODO est ce qu on peut comparer 2 tab ?
+
+        TypedSymbol symbol =(TypedSymbol) currentScope.resolve(ctx.exprId(0).getText());
+
+        //Test type of var and print equal
+        if(symbol.getType().equals("integer")){
+            printer.printEqualsValues(PCodePrinter.PCodeTypes.Int);
+        }
+        else {
+            printer.printEqualsValues(PCodePrinter.PCodeTypes.Bool);
+        }
+
+
+        return null;
     }
 
     @Override
     public Object visitNotExpr(B314Parser.NotExprContext ctx) {
-        return super.visitNotExpr(ctx);
+
+        //Load value
+        ctx.exprBool().accept(this);
+
+        //Not value
+        printer.printNot();
+
+        return null;
     }
 
     @Override
@@ -334,37 +456,157 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitEqualCaseExpr(B314Parser.EqualCaseExprContext ctx) {
-        return super.visitEqualCaseExpr(ctx);
+
+
+        //TODO Voir comment le type es défini en mem pour le test egualité
+        //Load Values
+        ctx.exprCase(0).accept(this);
+        ctx.exprCase(1).accept(this);
+
+       // printer.printEqualsValues();
+
+
+        return null;
     }
 
     @Override
     public Object visitSmthIsDirExpr(B314Parser.SmthIsDirExprContext ctx) {
-        return super.visitSmthIsDirExpr(ctx);
+
+        //Load Value
+        if(ctx.ENNEMI()!=null){
+            if(ctx.NORTH()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,9);
+            }
+            if(ctx.EAST()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,10);
+            }
+            if(ctx.SOUTH()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,11);
+            }
+            if(ctx.WEST()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,12);
+            }
+        }
+        else {
+            if(ctx.NORTH()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,13);
+            }
+            if(ctx.EAST()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,14);
+            }
+            if(ctx.SOUTH()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,15);
+            }
+            if(ctx.WEST()!=null){
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,16);
+            }
+        }
+        return null;
     }
 
     @Override
     public Object visitCompExpr(B314Parser.CompExprContext ctx) {
-        return super.visitCompExpr(ctx);
+
+        //Load Values
+        ctx.exprInt(0).accept(this);
+        ctx.exprInt(1).accept(this);
+
+        if(ctx.EQUALS_TO()!=null){
+            printer.printEqualsValues(PCodePrinter.PCodeTypes.Int);
+        }
+        if (ctx.GREATER_THAN()!=null){
+            printer.printGreather(PCodePrinter.PCodeTypes.Int);
+        }
+        if (ctx.SMALLER_THAN()!=null){
+            printer.printLess(PCodePrinter.PCodeTypes.Int);
+        }
+        return null;
     }
 
     @Override
     public Object visitTrueFalseExpr(B314Parser.TrueFalseExprContext ctx) {
-        return super.visitTrueFalseExpr(ctx);
+
+        if(ctx.TRUE()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Bool,1);
+        }
+        else {
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Bool,0);
+        }
+
+        return null;
     }
 
-    @Override
-    public Object visitParBoolExpr(B314Parser.ParBoolExprContext ctx) {
-        return super.visitParBoolExpr(ctx);
-    }
 
     @Override
     public Object visitAndOrExpr(B314Parser.AndOrExprContext ctx) {
-        return super.visitAndOrExpr(ctx);
+
+        //Load value
+        ctx.exprBool(0).accept(this);
+        ctx.exprBool(1).accept(this);
+        if (ctx.OR()!=null) {
+            printer.printOr();
+        }
+        else {
+            printer.printAnd();
+        }
+
+        return null;
     }
 
     @Override
     public Object visitExprCase(B314Parser.ExprCaseContext ctx) {
-        return super.visitExprCase(ctx);
+
+        //Load Value
+        if(ctx.exprCase()!=null){
+            ctx.exprCase().accept(this);
+        }
+        else{
+            if(ctx.DIRT()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,0);
+            }
+            if(ctx.ROCK()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,1);
+            }
+            if(ctx.VINES()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,2);
+            }
+            if(ctx.ZOMBIE()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,3);
+            }
+            if(ctx.PLAYER()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,4);
+            }
+            if(ctx.ENNEMI()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,5);
+            }
+            if(ctx.MAP()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,6);
+            }
+            if(ctx.RADIO()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,7);
+            }
+            if(ctx.AMMO()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,8);
+            }
+            if(ctx.FRUITS()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,9);
+            }
+            if(ctx.SODA()!=null){
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,10);
+            }
+            if(ctx.NEARBY()!=null){
+                int x = Integer.parseInt(ctx.exprInt(0).getText()); // Get x
+                int y = Integer.parseInt(ctx.exprInt(1).getText()); // Get y
+
+                int address = 17+ x*9+y;
+
+                printer.printLoad(PCodePrinter.PCodeTypes.Int,0,address);
+            }
+            if (ctx.exprId()!=null){
+                ctx.exprId().accept(this);
+            }
+        }
+        return null;
     }
 
     @Override
@@ -379,7 +621,18 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitFctCallExprID(B314Parser.FctCallExprIDContext ctx) {
-        return super.visitFctCallExprID(ctx);
+
+
+        printer.printMarkStack(0);//TODO vérifier diff prof
+
+        //Load all param
+        for (B314Parser.ExprContext exprContext : ctx.expr()) {
+            exprContext.accept(this);
+        }
+
+        //call fct
+        printer.printCallUserProcedure(ctx.expr().size(),ctx.identifier().getText());
+        return null;
     }
 
     @Override
@@ -414,5 +667,55 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     public void endPCode(){
         printer.printStop();
+    }
+
+    /**
+     * We use this function in the case where the var are not in the global scope
+     *
+     * @param nameFct Name of the current function scope
+     * @param nameVar Name of the Var that we want the PCodeTypes
+     * @return PCodeTypes of nameVar
+     */
+
+    private PCodePrinter.PCodeTypes typePCVarFct (String nameFct,String nameVar){
+
+        FunctionSymbol sym = (FunctionSymbol) this.scope.resolve(nameFct);
+
+        //Fonction scope
+        Scope fctScope = (Scope) sym.getAllSymbols().get(0).getScope();
+
+        System.out.println("test"+fctScope);
+
+        TypedSymbol symbol =(TypedSymbol) fctScope.resolve(nameVar);
+
+        System.out.println("test"+symbol);
+
+       if (symbol.getType().toString().equals("integer")) {
+           return PCodePrinter.PCodeTypes.Int;
+       }
+        else {
+           return PCodePrinter.PCodeTypes.Bool;
+       }
+
+    }
+
+    /**
+     *
+     * @param nameFct Name of the function
+     * @return Scope of  the function
+     */
+    private Scope getFunctionScope(String nameFct){
+        FunctionSymbol sym = (FunctionSymbol) this.scope.resolve(nameFct);
+
+
+        try {
+            Scope fctScope = (Scope) sym.getAllSymbols().get(0).getScope();
+            return fctScope;//Return function scope
+        }
+        catch (Exception e){
+            return currentScope;//If there are not elem in the scope we return the currentScope
+        }
+
+
     }
 }
