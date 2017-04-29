@@ -15,4 +15,5 @@ public interface Symbol {
 	// to satisfy adding symbols to sets, hashtables
 	int hashCode();
 	boolean equals(Object o);
+
 }
