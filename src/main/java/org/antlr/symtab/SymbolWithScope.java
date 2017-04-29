@@ -73,4 +73,8 @@ public abstract class SymbolWithScope extends BaseScope implements Symbol, Scope
 	public int hashCode() {
 		return name.hashCode();
 	}
+
+	private int scopeCounter;
+
+
 }
