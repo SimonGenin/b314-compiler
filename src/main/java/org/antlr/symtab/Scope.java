@@ -27,6 +27,7 @@ public interface Scope {
 	String getName();
 
 	/** Scope in which this scope defined. null if no enclosing scope */
+	/** Scope in which this scope defined. null if no enclosing scope */
 	Scope getEnclosingScope();
 
 	/** What scope encloses this scope. E.g., if this scope is a function,

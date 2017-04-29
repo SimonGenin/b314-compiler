@@ -31,6 +31,21 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitRoot(B314Parser.RootContext ctx) {
         currentScope=this.scope;
+
+
+        //TODo test
+        BaseSymbol symbol =(BaseSymbol) currentScope.resolve("s1");
+
+        System.out.println(symbol.getScopeCounter());
+
+        FunctionSymbol sym =(FunctionSymbol) currentScope.resolve("fct5");
+        Scope fctScope = (Scope) sym.getAllSymbols().get(0).getScope();
+
+        System.out.println("test"+fctScope);
+
+        BaseSymbol symbo =(BaseSymbol) fctScope.resolve("s1");
+        System.out.println(symbo.getScopeCounter());
+
         return super.visitRoot(ctx);
     }
 
@@ -296,10 +311,6 @@ public class PCodeVisitor extends B314BaseVisitor {
         return super.visitType(ctx);
     }
 
-    @Override
-    public Object visitScalar(B314Parser.ScalarContext ctx) {
-        return super.visitScalar(ctx);
-    }
 
     @Override
     public Object visitExpr(B314Parser.ExprContext ctx) {
@@ -324,6 +335,7 @@ public class PCodeVisitor extends B314BaseVisitor {
        }
         return null;
     }
+
 
     @Override
     public Object visitIntegerExpr(B314Parser.IntegerExprContext ctx) {
@@ -637,6 +649,10 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitIdentifierExprID(B314Parser.IdentifierExprIDContext ctx) {
+        //TODO ajouter profondeur
+
+
+        printer.printLoad(this.getPCodeTypes(ctx.getText()),0,this.getVarIndex(ctx.getText()));
         return super.visitIdentifierExprID(ctx);
     }
 
@@ -717,5 +733,32 @@ public class PCodeVisitor extends B314BaseVisitor {
         }
 
 
+    }
+
+    /**
+     *
+     * @param nameVar var's name
+     * @return PCodesTypes of variable (nameVar)
+     */
+    private PCodePrinter.PCodeTypes getPCodeTypes(String nameVar){
+        TypedSymbol sym=(TypedSymbol)this.currentScope.resolve(nameVar);
+
+        if (sym.getType().toString().equals("integer")) {
+            return PCodePrinter.PCodeTypes.Int;
+        }
+        else {
+            return PCodePrinter.PCodeTypes.Bool;
+        }
+    }
+
+    /**
+     *
+     * @param nameVar var's name
+     * @return Index of var in the Scope
+     */
+    private int getVarIndex(String nameVar){
+        BaseSymbol symbol =(BaseSymbol) currentScope.resolve(nameVar);
+
+        return symbol.getScopeCounter();
     }
 }
