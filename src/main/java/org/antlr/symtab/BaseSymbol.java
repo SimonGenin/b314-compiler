@@ -78,4 +78,16 @@ public abstract class BaseSymbol implements Symbol {
 		}
 		return s+getName();
 	}
+
+
+	private int scopeCounter;
+
+	public void setScopeCounter(int currentCounter) {
+		scopeCounter = currentCounter;
+	}
+
+	public int getScopeCounter() {
+		return scopeCounter;
+	}
+
 }

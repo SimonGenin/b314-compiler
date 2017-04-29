@@ -8,6 +8,10 @@ import java.util.Map;
 import java.util.Set;
 
 /** An abstract base class that houses common functionality for scopes. */
+
+/**
+ * Modified by Simon Genin
+ */
 public abstract class BaseScope implements Scope {
 	protected Scope enclosingScope; // null if this scope is the root of the scope tree
 
@@ -85,6 +89,8 @@ public abstract class BaseScope implements Scope {
 		return null; // not found
 	}
 
+	private int currentCounter = 0;
+
 	public void define(Symbol sym) throws IllegalArgumentException {
 		if ( symbols.containsKey(sym.getName()) ) {
 			throw new IllegalArgumentException("duplicate symbol "+sym.getName());
@@ -92,6 +98,13 @@ public abstract class BaseScope implements Scope {
 		sym.setScope(this);
 		sym.setInsertionOrderNumber(symbols.size()); // set to insertion position from 0
 		symbols.put(sym.getName(), sym);
+
+		// Add the scope counter
+		if (sym instanceof BaseSymbol) {
+			((BaseSymbol) sym).setScopeCounter(currentCounter);
+			currentCounter++;
+		}
+
 	}
 
 	public Scope getEnclosingScope() { return enclosingScope; }
