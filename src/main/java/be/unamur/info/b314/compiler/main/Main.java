@@ -159,16 +159,10 @@ public class Main {
 
         Visitor visitor = new Visitor();
         tree.accept(visitor);
-        //TODO test
+
         SymbolTable symtab = visitor.getSymTab();
 
-        GlobalScope scope = symtab.GLOBALS;
-        FunctionSymbol sym = (FunctionSymbol) scope.resolve("j");
-        //Scope sy = (Scope) sym.getAllSymbols().get(0).getScope();
-      //  scope.define((Symbol) sy);
 
-        System.out.println(scope.getAllNestedScopedSymbols());
-        //TODO fin test
         //Print PCode
         LOG.debug("Print PCode");
         printPCode(symtab,tree);

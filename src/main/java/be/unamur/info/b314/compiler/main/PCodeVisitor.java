@@ -574,12 +574,26 @@ public class PCodeVisitor extends B314BaseVisitor {
                 printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,10);
             }
             if(ctx.NEARBY()!=null){
-                int x = Integer.parseInt(ctx.exprInt(0).getText()); // Get x
-                int y = Integer.parseInt(ctx.exprInt(1).getText()); // Get y
 
-                int address = 17+ x*9+y;
+                //Load value x
+                ctx.exprInt(0).accept(this);
+                //Load value 9
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,9);
+                // value x * 9
+                printer.printMul(PCodePrinter.PCodeTypes.Int);
 
-                printer.printLoad(PCodePrinter.PCodeTypes.Int,0,address);
+                //Load Value y
+                ctx.exprInt(1).accept(this);
+                // x*9 + y
+                printer.printAdd(PCodePrinter.PCodeTypes.Int);
+
+                //x*9 + y +17
+                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,17);
+                printer.printAdd(PCodePrinter.PCodeTypes.Int);
+
+                //Load value at adress x*9 + y +17
+                printer.printIndexedFetch(PCodePrinter.PCodeTypes.Int);
+
             }
             if (ctx.exprId()!=null){
                 ctx.exprId().accept(this);
@@ -704,7 +718,7 @@ public class PCodeVisitor extends B314BaseVisitor {
      * @return PCodesTypes of variable (nameVar)
      */
     private PCodePrinter.PCodeTypes getPCodeTypes(String nameVar){
-        TypedSymbol sym=(TypedSymbol)this.currentScope.resolve(nameVar);
+        TypedSymbol sym =(TypedSymbol)this.currentScope.resolve(nameVar);
 
         if (sym.getType().toString().equals("integer")) {
             return PCodePrinter.PCodeTypes.Int;
