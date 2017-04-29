@@ -22,6 +22,8 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     private Scope currentScope;
 
+    private int whenIndex;
+
     public PCodeVisitor(SymbolTable symTable, PCodePrinter printer){
         this.symTable=symTable;
         this.printer=printer;
@@ -31,6 +33,9 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitRoot(B314Parser.RootContext ctx) {
         currentScope=this.scope;
+
+        System.out.println(currentScope);
+
         return super.visitRoot(ctx);
     }
 
@@ -41,13 +46,53 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitWhenClause(B314Parser.WhenClauseContext ctx) {
-        return super.visitWhenClause(ctx);
+
+
+        //Save currentScope
+        Scope oldScope =currentScope;
+
+        //Load FunctionScope of when
+        currentScope = this.getFunctionScope(Integer.toString(this.whenIndex));
+        this.whenIndex++;
+
+        //Load Bool
+        ctx.exprBool().accept(this);
+
+        //If false jump at the end
+        printer.printFalseJump("endWhen");
+
+        if(ctx.localvardecl()!=null) {
+            ctx.localvardecl().accept(this);
+        }
+
+        for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
+            instructionContext.accept(this);
+        }
+
+
+        printer.printDefineLabel("endWhen");
+        currentScope=oldScope;
+        return null;
     }
 
     @Override
     public Object visitDefaultClause(B314Parser.DefaultClauseContext ctx) {
+        //Save currentScope
+        Scope oldScope =currentScope;
 
-        super.visitDefaultClause(ctx);
+        //Load FunctionScope of when
+        currentScope = this.getFunctionScope("default");
+
+
+        if(ctx.localvardecl()!=null) {
+            ctx.localvardecl().accept(this);
+        }
+
+        for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
+            instructionContext.accept(this);
+        }
+
+        currentScope=oldScope;
 
         //Test if we have a next action
         //if not prin 0
@@ -698,6 +743,7 @@ public class PCodeVisitor extends B314BaseVisitor {
      * @return Scope of  the function
      */
     private Scope getFunctionScope(String nameFct){
+        System.out.println(nameFct);
         FunctionSymbol sym = (FunctionSymbol) this.scope.resolve(nameFct);
 
 
@@ -720,6 +766,7 @@ public class PCodeVisitor extends B314BaseVisitor {
     private PCodePrinter.PCodeTypes getPCodeTypes(String nameVar){
         TypedSymbol sym =(TypedSymbol)this.currentScope.resolve(nameVar);
 
+        System.out.println(nameVar);
         if (sym.getType().toString().equals("integer")) {
             return PCodePrinter.PCodeTypes.Int;
         }

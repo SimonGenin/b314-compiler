@@ -31,6 +31,8 @@ public class Visitor extends B314BaseVisitor
     private boolean isPendingSymbolAnArray = false;
     private boolean isPendingSymbolAFunctionParameter = false;
 
+    private int whenIndex;
+
     // primitive types
     private PrimitiveType booleanType;
     private PrimitiveType integerType;
@@ -332,24 +334,23 @@ public class Visitor extends B314BaseVisitor
 
 
 
-        // Define a new local scope to the when structure
-        LocalScope localScope = new LocalScope(currentScope);
+        // Creates the scoped symbol from the context, and set it in its parent scope
+        FunctionSymbol functionSymbol = new FunctionSymbol(Integer.toString(this.whenIndex));
+        this.whenIndex++;
 
+
+        // We add the when clause to the scope
+        currentScope.define(functionSymbol);
 
 
         // Save the old scope
         Scope oldScope = currentScope;
 
         // Set the new scope
-        currentScope = localScope;
+        currentScope = functionSymbol;
 
         // visit normally all children
         super.visitWhenClause(ctx);
-
-        //TODO test
-        /*System.out.println("test "+currentScope.resolve("b1"));
-        FieldSymbol f =new FieldSymbol()
-        System.out.println(s);*/
 
 
         // We exit the when structure, so we put back the old scope
@@ -367,15 +368,19 @@ public class Visitor extends B314BaseVisitor
         LOG.debug("[SymTab] visit default clause : ");       ;
         LOG.debug("[SymTab] define new local scope");
 
-        // Define a new local scope to the when structure
-        LocalScope localScope = new LocalScope(currentScope);
+        // Creates the scoped symbol from the context, and set it in its parent scope
+        FunctionSymbol functionSymbol = new FunctionSymbol("default");
+
+
+        // We add the when clause to the scope
+        currentScope.define(functionSymbol);
+
 
         // Save the old scope
         Scope oldScope = currentScope;
 
-
         // Set the new scope
-        currentScope = localScope;
+        currentScope = functionSymbol;
 
         // visit normally all children
         super.visitDefaultClause(ctx);

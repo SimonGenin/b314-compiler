@@ -46,6 +46,21 @@ declare and retain
     		done
     	done
 when your turn
+when true and b1
+   declare local
+      x1 as square;
+  do
+
+		compute fct1()
+	done
+	when true and b1
+       declare local
+          x1 as square;
+      do
+
+    		compute fct1()
+    	done
+
 by default
     do
     	compute fct1()
