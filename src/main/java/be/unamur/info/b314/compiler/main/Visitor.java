@@ -151,14 +151,14 @@ public class Visitor extends B314BaseVisitor
             symbol = new VariableSymbol(ctx.ID().getText());
         }
 
-        // We define the scope of the new symbol to the current one.
-        currentScope.define(symbol);
-
         // We save the reference of the symbol for later use in the type definition
         pendingSymbol = symbol;
 
         // We visit the type definition
         ctx.type().accept(this);
+
+        // We define the scope of the new symbol to the current one.
+        currentScope.define(symbol);
 
         return null;
     }
@@ -488,6 +488,7 @@ public class Visitor extends B314BaseVisitor
         if (ctx.exprL().identifier() != null) {
             ctx.exprL().identifier().accept(this);
             var = (TypedSymbol) currentScope.resolve(ctx.exprL().identifier().ID().getText());
+
         }
 
         if (ctx.exprL().arrayExpr() != null) {

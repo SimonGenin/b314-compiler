@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import be.unamur.info.b314.compiler.symtab.ArrayType;
+import com.sun.xml.internal.rngom.parse.host.Base;
 
 /** An abstract base class that houses common functionality for scopes. */
 
@@ -102,22 +103,22 @@ public abstract class BaseScope implements Scope {
 		symbols.put(sym.getName(), sym);
 
 		// Add the scope counter
-		if (sym instanceof BaseSymbol) {
+    if (sym instanceof BaseSymbol) {
 
 			((BaseSymbol) sym).setScopeCounter(currentCounter);
 
 			// Si c'est un tableau
-			if (sym instanceof ArrayType) {
+			if (sym instanceof TypedSymbol && ((TypedSymbol)sym).getType() instanceof ArrayType) {
 
 				// On check si il est multi-dimensionnel
 				// On ajoute le bon nombre de positions de maniere adéquate
 
-				if (((ArrayType)sym).getIndexNumber() == 2) {
-					currentCounter += ((ArrayType)sym).firstArg * ((ArrayType)sym).secondArg;
+                if ( (((ArrayType)(((TypedSymbol)sym).getType())).getIndexNumber()) == 2) {
+					currentCounter += ((ArrayType)(((TypedSymbol)sym).getType())).firstArg * ((ArrayType)(((TypedSymbol)sym).getType())).secondArg;
 				}
 
 				else {
-					currentCounter += ((ArrayType)sym).firstArg;
+					currentCounter += ((ArrayType)(((TypedSymbol)sym).getType())).firstArg;
 				}
 
 			}
