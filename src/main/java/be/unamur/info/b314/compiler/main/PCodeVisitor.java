@@ -5,6 +5,7 @@ import be.unamur.info.b314.compiler.B314Parser;
 import be.unamur.info.b314.compiler.PCode.PCodePrinter;
 import be.unamur.info.b314.compiler.symtab.FunctionSymbol;
 import org.antlr.symtab.*;
+import sun.reflect.generics.tree.TypeSignature;
 
 import java.io.ObjectOutputStream;
 import java.util.Map;
@@ -174,7 +175,16 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitSetToInstr(B314Parser.SetToInstrContext ctx) {
-        return super.visitSetToInstr(ctx);
+        //Load adress var
+        ctx.exprL().accept(this);
+
+        //Load value et to var
+        ctx.expr().accept(this);
+
+        //Store the Value
+        printer.printStore(this.getPCodeTypes(ctx.exprL().getText()));
+
+        return null;
     }
 
     @Override
@@ -664,25 +674,21 @@ public class PCodeVisitor extends B314BaseVisitor {
                 printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,10);
             }
             if(ctx.NEARBY()!=null){
-
+                //load adress nearby
+                printer.printLoadAdress(PCodePrinter.PCodeTypes.Int,0,17);
                 //Load value x
                 ctx.exprInt(0).accept(this);
-                //Load value 9
-                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,9);
-                // value x * 9
-                printer.printMul(PCodePrinter.PCodeTypes.Int);
+                //shift x
+                printer.printIndexedAdressComputation(9);
 
-                //Load Value y
+                //Load y value
                 ctx.exprInt(1).accept(this);
-                // x*9 + y
-                printer.printAdd(PCodePrinter.PCodeTypes.Int);
-
-                //x*9 + y +17
-                printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,17);
-                printer.printAdd(PCodePrinter.PCodeTypes.Int);
+                //shift y
+                printer.printIndexedAdressComputation(1);
 
                 //Load value at adress x*9 + y +17
                 printer.printIndexedFetch(PCodePrinter.PCodeTypes.Int);
+                //TODO vérifier val
 
             }
             if (ctx.exprId()!=null){
@@ -721,7 +727,17 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitExprL(B314Parser.ExprLContext ctx) {
-        return super.visitExprL(ctx);
+        //TODO ajouter profondeur
+        System.out.println(ctx.getText());
+        if (ctx.identifier()!=null){
+            printer.printLoadAdress(this.getPCodeTypes(ctx.identifier().getText()),0,this.getVarIndex(ctx.getText()));
+        }
+        else {
+           // printer.printLoadAdress(this.getPCodeTypes());
+        }
+
+
+        return null;
     }
 
     @Override
@@ -826,6 +842,8 @@ public class PCodeVisitor extends B314BaseVisitor {
      * @return Index of var in the Scope
      */
     private int getVarIndex(String nameVar){
+
+        System.out.println("test : "+ nameVar);
         BaseSymbol symbol =(BaseSymbol) currentScope.resolve(nameVar);
 
         return symbol.getScopeCounter();
