@@ -33,9 +33,6 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitRoot(B314Parser.RootContext ctx) {
         currentScope=this.scope;
-
-        System.out.println(currentScope);
-
         return super.visitRoot(ctx);
     }
 
@@ -166,7 +163,13 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitComputeInstr(B314Parser.ComputeInstrContext ctx) {
-        return super.visitComputeInstr(ctx);
+
+        //Load val expr
+        ctx.expr().accept(this);
+        //Pop val
+        printer.printPop();
+
+        return null;
     }
 
     @Override
