@@ -31,21 +31,6 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitRoot(B314Parser.RootContext ctx) {
         currentScope=this.scope;
-
-
-        //TODo test
-        BaseSymbol symbol =(BaseSymbol) currentScope.resolve("s1");
-
-        System.out.println(symbol.getScopeCounter());
-
-        FunctionSymbol sym =(FunctionSymbol) currentScope.resolve("fct5");
-        Scope fctScope = (Scope) sym.getAllSymbols().get(0).getScope();
-
-        System.out.println("test"+fctScope);
-
-        BaseSymbol symbo =(BaseSymbol) fctScope.resolve("s1");
-        System.out.println(symbo.getScopeCounter());
-
         return super.visitRoot(ctx);
     }
 
@@ -603,15 +588,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         return null;
     }
 
-    @Override
-    public Object visitParIDExpr(B314Parser.ParIDExprContext ctx) {
-        return super.visitParIDExpr(ctx);
-    }
 
-    @Override
-    public Object visitArrayIndexExprID(B314Parser.ArrayIndexExprIDContext ctx) {
-        return super.visitArrayIndexExprID(ctx);
-    }
 
     @Override
     public Object visitFctCallExprID(B314Parser.FctCallExprIDContext ctx) {
