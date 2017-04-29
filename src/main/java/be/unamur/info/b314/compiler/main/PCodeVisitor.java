@@ -198,24 +198,66 @@ public class PCodeVisitor extends B314BaseVisitor {
         return null;
     }
 
-    @Override
-    public Object visitNextInstr(B314Parser.NextInstrContext ctx) {
-        return super.visitNextInstr(ctx);
-    }
+
 
     @Override
     public Object visitShootAct(B314Parser.ShootActContext ctx) {
-        return super.visitShootAct(ctx);
+        if(ctx.NORTH()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,5);
+        }
+        if(ctx.EAST()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,6);
+        }
+        if(ctx.SOUTH()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,7);
+        }
+        if(ctx.WEST()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,8);
+        }
+
+        printer.printPrin();
+
+        return null;
     }
 
     @Override
     public Object visitMoveAct(B314Parser.MoveActContext ctx) {
-        return super.visitMoveAct(ctx);
+        if(ctx.NORTH()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,1);
+        }
+        if(ctx.EAST()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,2);
+        }
+        if(ctx.SOUTH()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,3);
+        }
+        if(ctx.WEST()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,4);
+        }
+
+        printer.printPrin();
+
+        return null;
     }
 
     @Override
     public Object visitUseAct(B314Parser.UseActContext ctx) {
-        return super.visitUseAct(ctx);
+        if(ctx.MAP()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,9);
+        }
+        if(ctx.RADIO()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,10);
+        }
+        if(ctx.FRUITS()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,11);
+        }
+        if(ctx.SODA()!=null){
+            printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,12);
+        }
+
+        printer.printPrin();
+
+        return null;
     }
 
     @Override
