@@ -32,6 +32,8 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     private int whileIndex;
 
+    private int currentDepth;
+
     public PCodeVisitor(SymbolTable symTable, PCodePrinter printer){
         this.symTable=symTable;
         this.printer=printer;
@@ -49,7 +51,12 @@ public class PCodeVisitor extends B314BaseVisitor {
 
         TypedSymbol sym=(TypedSymbol) currentScope.resolve("v3");
         System.out.println("le type est "+this.getPCodeTypes("fct5"));
+
 */
+        FunctionSymbol fsym = (FunctionSymbol) currentScope.resolve("fct5");
+        BaseSymbol sym = (BaseSymbol) fsym.resolve("x") ;
+        System.out.println(sym.getDepth());
+
 
         return super.visitRoot(ctx);
     }
@@ -88,9 +95,12 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitWhenClause(B314Parser.WhenClauseContext ctx) {
 
+        this.spaceVar=0;
 
         printer.printComments("");
         printer.printComments("Begin whenClause : "+this.whenIndex);
+
+        this.currentDepth=1;
 
         printer.printDefineLabel("when"+this.whenIndex);
 
@@ -111,6 +121,8 @@ public class PCodeVisitor extends B314BaseVisitor {
             ctx.localvardecl().accept(this);
         }
 
+        printer.printSetStackPointer(this.spaceVar);
+
         for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
             instructionContext.accept(this);
         }
@@ -121,6 +133,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         printer.printReturnFromProcedure();
 
         printer.printComments("End whenClause : "+(this.whenIndex-1));
+        this.currentDepth =0;
         return null;
     }
 
@@ -128,6 +141,8 @@ public class PCodeVisitor extends B314BaseVisitor {
     public Object visitDefaultClause(B314Parser.DefaultClauseContext ctx) {
 
 
+        this.spaceVar=0;
+        this.currentDepth =1;
 
         printer.printComments("");
         printer.printComments("Begin Default");
@@ -143,6 +158,8 @@ public class PCodeVisitor extends B314BaseVisitor {
         if(ctx.localvardecl()!=null) {
             ctx.localvardecl().accept(this);
         }
+
+        printer.printSetStackPointer(this.spaceVar);
 
         for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
             instructionContext.accept(this);
@@ -173,6 +190,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         printer.printReturnFromProcedure();
         printer.printComments("End Default");
 
+        this.currentDepth =0;
         return null;
     }
 
@@ -180,19 +198,20 @@ public class PCodeVisitor extends B314BaseVisitor {
     public Object visitIfThenDoneInstr(B314Parser.IfThenDoneInstrContext ctx) {
 
         this.ifIndex++;
+        int i =this.ifIndex;
 
         //Load val of bool
         ctx.exprBool().accept(this);
 
         //Jump if false
-        printer.printFalseJump("If_false"+this.ifIndex);
+        printer.printFalseJump("If_false"+i);
 
         //Do instruction
         for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
             instructionContext.accept(this);
         }
 
-        printer.printDefineLabel("If_false"+this.ifIndex);
+        printer.printDefineLabel("If_false"+i);
 
         return null;
     }
@@ -201,27 +220,27 @@ public class PCodeVisitor extends B314BaseVisitor {
     public Object visitIfThenElseDoneInstr(B314Parser.IfThenElseDoneInstrContext ctx) {
 
         this.ifIndex++;
-
+        int i =this.ifIndex;
         //Load val of bool
         ctx.exprBool().accept(this);
 
         printer.printNot();
 
         //Jump if false
-        printer.printFalseJump("If_true"+this.ifIndex);
+        printer.printFalseJump("If_true"+i);
 
         //Do instruction else
         ctx.setinstrucion(1).accept(this);
         //Go to the end of the if
-        printer.printUnconditionalJump("If_end"+this.ifIndex);
+        printer.printUnconditionalJump("If_end"+i);
 
         //begin then
-        printer.printDefineLabel("If_true"+this.ifIndex);
+        printer.printDefineLabel("If_true"+i);
         //Do instruction then
         ctx.setinstrucion(0).accept(this);
 
         //end of if
-        printer.printDefineLabel("If_end"+this.ifIndex);
+        printer.printDefineLabel("If_end"+i);
 
         return null;
     }
@@ -257,24 +276,25 @@ public class PCodeVisitor extends B314BaseVisitor {
     public Object visitWhileDoDoneInstr(B314Parser.WhileDoDoneInstrContext ctx) {
 
         this.whileIndex++;
+        int i =this.whenIndex;
 
         //Come back after intruction in the loop
-        printer.printDefineLabel("back_while_test"+this.whileIndex);
+        printer.printDefineLabel("back_while_test"+i);
 
         //Load val of bool
         ctx.exprBool().accept(this);
 
         //Jump if false
-        printer.printFalseJump("Go_out_loop"+this.whileIndex);
+        printer.printFalseJump("Go_out_loop"+i);
 
         //Do instruction
         for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
             instructionContext.accept(this);
         }
         //Go to test
-        printer.printUnconditionalJump("back_while_test"+this.whileIndex);
+        printer.printUnconditionalJump("back_while_test"+i);
 
-        printer.printDefineLabel("Go_out_loop"+this.whileIndex);
+        printer.printDefineLabel("Go_out_loop"+i);
 
         return null;
     }
@@ -356,6 +376,8 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitFunctionDeclaration(B314Parser.FunctionDeclarationContext ctx) {
 
+        this.currentDepth=1;
+
         printer.printComments("");
         printer.printComments("Begin function : "+ctx.ID().getText());
 
@@ -402,6 +424,7 @@ public class PCodeVisitor extends B314BaseVisitor {
 
         printer.printComments("End function : "+ctx.ID().getText());
 
+        this.currentDepth=0;
 
         return null;
     }
@@ -507,26 +530,26 @@ public class PCodeVisitor extends B314BaseVisitor {
 
         //Load Value
         if(ctx.MAP()!=null) {
-            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 3);
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, currentDepth, 3);
         }
         if(ctx.RADIO()!=null) {
-            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 4);
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, currentDepth, 4);
         }
         if(ctx.AMMO()!=null) {
-            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 5);
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, currentDepth, 5);
         }
         if(ctx.FRUITS()!=null) {
-            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 6);
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, currentDepth, 6);
         }
         if(ctx.SODA()!=null) {
-            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 7);
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, currentDepth, 7);
         }
         return null;
     }
 
     @Override
     public Object visitLifeExpr(B314Parser.LifeExprContext ctx) {
-        printer.printLoad(PCodePrinter.PCodeTypes.Int,0,8);
+        printer.printLoad(PCodePrinter.PCodeTypes.Int,currentDepth,8);
         return null;
     }
 
@@ -551,13 +574,13 @@ public class PCodeVisitor extends B314BaseVisitor {
 
         //Load Value
         if(ctx.LATITUDE()!=null) {
-            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 0);
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, currentDepth, 0);
         }
         if(ctx.LONGITUDE()!=null) {
-            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 1);
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, currentDepth, 1);
         }
         if(ctx.GRID()!=null) {
-            printer.printLoad(PCodePrinter.PCodeTypes.Int, 0, 2);
+            printer.printLoad(PCodePrinter.PCodeTypes.Int, currentDepth, 2);
         }
 
         return null ;
@@ -642,30 +665,30 @@ public class PCodeVisitor extends B314BaseVisitor {
         //Load Value
         if(ctx.ENNEMI()!=null){
             if(ctx.NORTH()!=null){
-                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,9);
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,currentDepth,9);
             }
             if(ctx.EAST()!=null){
-                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,10);
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,currentDepth,10);
             }
             if(ctx.SOUTH()!=null){
-                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,11);
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,currentDepth,11);
             }
             if(ctx.WEST()!=null){
-                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,12);
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,currentDepth,12);
             }
         }
         else {
             if(ctx.NORTH()!=null){
-                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,13);
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,currentDepth,13);
             }
             if(ctx.EAST()!=null){
-                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,14);
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,currentDepth,14);
             }
             if(ctx.SOUTH()!=null){
-                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,15);
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,currentDepth,15);
             }
             if(ctx.WEST()!=null){
-                printer.printLoad(PCodePrinter.PCodeTypes.Bool,0,16);
+                printer.printLoad(PCodePrinter.PCodeTypes.Bool,currentDepth,16);
             }
         }
         return null;
@@ -763,7 +786,7 @@ public class PCodeVisitor extends B314BaseVisitor {
             }
             if(ctx.NEARBY()!=null){
                 //load adress nearby
-                printer.printLoadAdress(PCodePrinter.PCodeTypes.Int,0,17);
+                printer.printLoadAdress(PCodePrinter.PCodeTypes.Int,currentDepth,17);
                 //Load value x
                 ctx.exprInt(0).accept(this);
                 //shift x
@@ -791,8 +814,8 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitFctCallExprID(B314Parser.FctCallExprIDContext ctx) {
 
-
-        printer.printMarkStack(0);//TODO vérifier diff prof
+        printer.printComments("Call : "+ctx.identifier().getText());
+        printer.printMarkStack(1);//TODO vérifier diff prof
 
         //Load all param
         for (B314Parser.ExprContext exprContext : ctx.expr()) {
@@ -809,7 +832,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         //TODO ajouter profondeur
 
 
-        printer.printLoad(this.getPCodeTypes(ctx.getText()),0,this.getVarIndex(ctx.getText()));
+        printer.printLoad(this.getPCodeTypes(ctx.getText()),this.getVarDepth(ctx.getText()),this.getVarIndex(ctx.getText()));
         return null;
     }
 
@@ -953,5 +976,15 @@ public class PCodeVisitor extends B314BaseVisitor {
         BaseSymbol symbol =(BaseSymbol) currentScope.resolve(nameVar);
 
         return symbol.getScopeCounter();
+    }
+
+    /**
+     *
+     * @param nameVar var's name
+     * @return Depth of var
+     */
+    private int getVarDepth(String nameVar){
+        BaseSymbol sym = (BaseSymbol) currentScope.resolve(nameVar) ;
+        return this.currentDepth- sym.getDepth();
     }
 }
