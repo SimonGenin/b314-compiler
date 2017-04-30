@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import be.unamur.info.b314.compiler.symtab.ArrayType;
-import com.sun.xml.internal.rngom.parse.host.Base;
+
 
 /** An abstract base class that houses common functionality for scopes. */
 

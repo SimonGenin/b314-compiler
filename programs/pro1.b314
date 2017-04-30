@@ -15,10 +15,7 @@ declare and retain
     	do
     		skip
     	done
-    fct3 as function():boolean
-    	do
-    		set fct3 to true and false or not graal is north or b1 and b2
-    	done
+
 	s1 as square;
 	i2 as integer;
 	b6 as boolean;
@@ -35,7 +32,7 @@ declare and retain
      declare local
     x1 as square;
     	do
-    		if not fct3() or y and x = 2 then
+    		if  y and x = 2 then
     			while x < i3 do
     				set x to x + 1
     			done
@@ -68,7 +65,5 @@ by default
     	if fct5(i1 + 2, s2 = ammo, ennemi) > 2 then
     		skip
     	done
-    	while fct3() do
-    		skip
-    	done
+
     done

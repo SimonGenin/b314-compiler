@@ -25,6 +25,12 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     private int whenIndex;
 
+    private int spaceVar;
+
+    private int ifIndex;
+
+    private int whileIndex;
+
     public PCodeVisitor(SymbolTable symTable, PCodePrinter printer){
         this.symTable=symTable;
         this.printer=printer;
@@ -34,20 +40,48 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitRoot(B314Parser.RootContext ctx) {
         currentScope=this.scope;
+
+        //TODO test
+        System.out.println("index : "+this.getVarIndex("v3"));
+        System.out.println("index : "+this.getVarIndex("v2"));
+        System.out.println("index : "+this.getVarIndex("v4"));
+
+
         return super.visitRoot(ctx);
     }
 
     @Override
     public Object visitProgramRule(B314Parser.ProgramRuleContext ctx) {
-        return super.visitProgramRule(ctx);
+
+
+        ////Visit global decl of var and fct
+        ctx.globdecl().accept(this);
+
+        printer.printComments("");
+        printer.printComments("------START PROGRAM-----");
+
+        //Begin of the program
+        printer.printDefineLabel("begin");
+
+        //Visit When clause
+        for (B314Parser.ClauseWhenContext clauseWhenContext : ctx.clauseWhen()) {
+            clauseWhenContext.accept(this);
+        }
+
+        //Visit Default clause
+        ctx.clauseDefault().accept(this);
+
+        return null;
     }
 
     @Override
     public Object visitWhenClause(B314Parser.WhenClauseContext ctx) {
 
+        printer.printComments("");
+        printer.printComments("Begin whenClause : "+this.whenIndex);
 
         //Save currentScope
-        Scope oldScope =currentScope;
+        Scope oldScope = currentScope;
 
         //Load FunctionScope of when
         currentScope = this.getFunctionScope(Integer.toString(this.whenIndex));
@@ -57,7 +91,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         ctx.exprBool().accept(this);
 
         //If false jump at the end
-        printer.printFalseJump("endWhen");
+        printer.printFalseJump("endWhen"+this.whenIndex);
 
         if(ctx.localvardecl()!=null) {
             ctx.localvardecl().accept(this);
@@ -68,13 +102,19 @@ public class PCodeVisitor extends B314BaseVisitor {
         }
 
 
-        printer.printDefineLabel("endWhen");
+        printer.printDefineLabel("endWhen"+this.whenIndex);
         currentScope=oldScope;
+
+        printer.printComments("End whenClause : "+(this.whenIndex-1));
         return null;
     }
 
     @Override
     public Object visitDefaultClause(B314Parser.DefaultClauseContext ctx) {
+
+        printer.printComments("");
+        printer.printComments("Begin Default");
+
         //Save currentScope
         Scope oldScope =currentScope;
 
@@ -112,24 +152,29 @@ public class PCodeVisitor extends B314BaseVisitor {
             System.out.println("Return prin 0");
         }
 
+
+        printer.printComments("End Default");
+
         return null;
     }
 
     @Override
     public Object visitIfThenDoneInstr(B314Parser.IfThenDoneInstrContext ctx) {
 
+        this.ifIndex++;
+
         //Load val of bool
         ctx.exprBool().accept(this);
 
         //Jump if false
-        printer.printFalseJump("false");
+        printer.printFalseJump("If_false"+this.ifIndex);
 
         //Do instruction
         for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
             instructionContext.accept(this);
         }
 
-        printer.printDefineLabel("false");
+        printer.printDefineLabel("If_false"+this.ifIndex);
 
         return null;
     }
@@ -137,26 +182,28 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitIfThenElseDoneInstr(B314Parser.IfThenElseDoneInstrContext ctx) {
 
+        this.ifIndex++;
+
         //Load val of bool
         ctx.exprBool().accept(this);
 
         printer.printNot();
 
         //Jump if false
-        printer.printFalseJump("true");
+        printer.printFalseJump("If_true"+this.ifIndex);
 
         //Do instruction else
         ctx.setinstrucion(1).accept(this);
         //Go to the end of the if
-        printer.printUnconditionalJump("end");
+        printer.printUnconditionalJump("If_end"+this.ifIndex);
 
         //begin then
-        printer.printDefineLabel("true");
+        printer.printDefineLabel("If_true"+this.ifIndex);
         //Do instruction then
         ctx.setinstrucion(0).accept(this);
 
         //end of if
-        printer.printDefineLabel("end");
+        printer.printDefineLabel("If_end"+this.ifIndex);
 
         return null;
     }
@@ -190,23 +237,25 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitWhileDoDoneInstr(B314Parser.WhileDoDoneInstrContext ctx) {
 
+        this.whileIndex++;
+
         //Come back after intruction in the loop
-        printer.printDefineLabel("back_while_test");
+        printer.printDefineLabel("back_while_test"+this.whileIndex);
 
         //Load val of bool
         ctx.exprBool().accept(this);
 
         //Jump if false
-        printer.printFalseJump("Go_out_loop");
+        printer.printFalseJump("Go_out_loop"+this.whileIndex);
 
         //Do instruction
         for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
             instructionContext.accept(this);
         }
         //Go to test
-        printer.printUnconditionalJump("back_while_test");
+        printer.printUnconditionalJump("back_while_test"+this.whileIndex);
 
-        printer.printDefineLabel("Go_out_loop");
+        printer.printDefineLabel("Go_out_loop"+this.whileIndex);
 
         return null;
     }
@@ -284,6 +333,11 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitFunctionDeclaration(B314Parser.FunctionDeclarationContext ctx) {
 
+        printer.printComments("");
+        printer.printComments("Begin function : "+ctx.ID().getText());
+
+        this.spaceVar=5;
+
         //Save currentScope
         Scope oldScope =currentScope;
 
@@ -294,18 +348,18 @@ public class PCodeVisitor extends B314BaseVisitor {
         //Define label with the id of the function
         printer.printDefineLabel(id);
 
-        //Create SetStackPointer
-        if (currentScope.equals(oldScope)){
-            printer.printSetStackPointer(5);
-        }
-        else {
-            printer.printSetStackPointer(5+currentScope.getAllSymbols().size());
-
-        }
-
+        //Visit param
         for (B314Parser.VardeclContext vardeclContext : ctx.vardecl()) {
           //TODO gérer le chargement des param
+            vardeclContext.accept(this);
         }
+
+        //Visit local decl
+        if(ctx.localvardecl()!=null) {
+            ctx.localvardecl().accept(this);
+        }
+
+        printer.printSetStackPointer(this.spaceVar);
 
         //Do all the instruction
         for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
@@ -323,64 +377,75 @@ public class PCodeVisitor extends B314BaseVisitor {
         //Load the oldScope
         currentScope =oldScope;
 
+        printer.printComments("End function : "+ctx.ID().getText());
+
+
         return null;
     }
 
     @Override
     public Object visitGlobalDeclaration(B314Parser.GlobalDeclarationContext ctx) {
-        int space = 0;
-        // We start by visiting the vars
+        this.spaceVar=99;
 
 
+
+        // We start by visiting the vars decl
         if (ctx.vardecl() != null) {
             for (B314Parser.VardeclContext decl : ctx.vardecl()) {
-                space=space+1;
+                decl.accept(this);
             }
         }
-        System.out.println("Reserve space for Global Declaration : "+space);
-        printer.printSetStackPointer(space);
+        System.out.println("Reserve space for Global Declaration : "+this.spaceVar);
+        printer.printSetStackPointer(this.spaceVar);
 
-        return super.visitGlobalDeclaration(ctx);
-    }
+        //Read 99 value
+        this.initEnvVar();
 
-    @Override
-    public Object visitVariableDeclaration(B314Parser.VariableDeclarationContext ctx) {
-        return super.visitVariableDeclaration(ctx);
-    }
+        //Jump at the begin of the program
+        printer.printUnconditionalJump("begin");
 
-    @Override
-    public Object visitLocalDeclaration(B314Parser.LocalDeclarationContext ctx) {
-        int space = 0;
-        // We start by visiting the vars
-
-
-        if (ctx.vardecl() != null) {
-            for (B314Parser.VardeclContext decl : ctx.vardecl()) {
-                space=space+1;
-
-
+        //Visit fct decl
+        if (ctx.fctdecl() != null){
+            for (B314Parser.FctdeclContext fctdeclContext : ctx.fctdecl()) {
+                fctdeclContext.accept(this);
             }
         }
-        System.out.println("Reserve space for Local Declaration : "+space);
-        printer.printSetStackPointer(space);
+
         return null;
     }
 
     @Override
-    public Object visitArray(B314Parser.ArrayContext ctx) {
-        //TODO voir comment directement le faire pour toute avec tab symbole
-        String scalar = ctx.scalar().getText();
-        int number = Integer.parseInt(ctx.NUMBER(0).getText());
+    public Object visitVariableDeclaration(B314Parser.VariableDeclarationContext ctx) {
 
+        if (ctx.type().scalar()!=null){
+            //add 1 to space for scalar var
+            this.spaceVar=this.spaceVar+1;
+        }
+        else {
+            //add size of array for array var
+            int x = Integer.parseInt(ctx.type().array().NUMBER(0).getText());
+            int y=1;
+            if (ctx.type().array().NUMBER(1)!=null){
+                y = Integer.parseInt(ctx.type().array().NUMBER(1).getText());
+            }
+            this.spaceVar=this.spaceVar+(x*y);
 
-        if (ctx.NUMBER(1)!=null){
-            number = number*Integer.parseInt(ctx.NUMBER(1).getText());
         }
 
-        // Reserve space for array
-        System.out.println("Reserve space for array : "+ number);
-        printer.printSetStackPointer(number);
+        return null;
+    }
 
+    @Override
+    public Object visitLocalDeclaration(B314Parser.LocalDeclarationContext ctx) {
+        this.spaceVar = 0;
+        // We start by visiting the vars
+
+
+        if (ctx.vardecl() != null) {
+            for (B314Parser.VardeclContext decl : ctx.vardecl()) {
+                decl.accept(this);
+            }
+        }
         return null;
     }
 
@@ -755,7 +820,6 @@ public class PCodeVisitor extends B314BaseVisitor {
     }
 
     public void initEnvVar(){
-        printer.printSetStackPointer(99);
         for (int i = 0; i <99 ; i++) {
             printer.printLoadAdress(PCodePrinter.PCodeTypes.Int,0,i);
             printer.printRead();

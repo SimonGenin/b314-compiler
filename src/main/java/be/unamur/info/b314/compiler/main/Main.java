@@ -255,7 +255,6 @@ public class Main {
         PCodeVisitor visitor = new PCodeVisitor(symtable,printer);
 
         //create environement variable
-        visitor.initEnvVar();
         tree.accept(visitor);
 
         //finish file out
