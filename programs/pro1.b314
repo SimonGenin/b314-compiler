@@ -15,12 +15,15 @@ declare and retain
     	do
     		skip
     	done
-
+    fct3 as function():boolean
+    	do
+    		set fct3 to true and false or not graal is north or b1 and b2
+    	done
 	s1 as square;
 	i2 as integer;
 	b6 as boolean;
 	    v2 as boolean[5, 7];
-    v3 as integer[42, 58];
+    v3 as boolean[42,56];
     v4 as integer[42];
     i3 as integer;
     s2 as square;
@@ -62,6 +65,7 @@ by default
     do
     	compute fct1()
     	set s1 to fct1()
+    	compute v3[1,1]
     	if fct5(i1 + 2, s2 = ammo, ennemi) > 2 then
     		skip
     	done

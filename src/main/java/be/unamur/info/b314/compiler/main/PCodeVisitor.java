@@ -3,6 +3,7 @@ package be.unamur.info.b314.compiler.main;
 import be.unamur.info.b314.compiler.B314BaseVisitor;
 import be.unamur.info.b314.compiler.B314Parser;
 import be.unamur.info.b314.compiler.PCode.PCodePrinter;
+import be.unamur.info.b314.compiler.symtab.*;
 import be.unamur.info.b314.compiler.symtab.FunctionSymbol;
 import org.antlr.symtab.*;
 import sun.reflect.generics.tree.TypeSignature;
@@ -45,6 +46,9 @@ public class PCodeVisitor extends B314BaseVisitor {
         System.out.println("index : "+this.getVarIndex("v3"));
         System.out.println("index : "+this.getVarIndex("v2"));
         System.out.println("index : "+this.getVarIndex("v4"));
+
+        TypedSymbol sym=(TypedSymbol) currentScope.resolve("v3");
+        System.out.println(sym.getType());
 
 
         return super.visitRoot(ctx);
@@ -150,7 +154,6 @@ public class PCodeVisitor extends B314BaseVisitor {
             printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,0);
             printer.printPrin();
             printer.printStop();
-            System.out.println("Return prin 0");
         }
 
 
@@ -799,24 +802,45 @@ public class PCodeVisitor extends B314BaseVisitor {
     public Object visitExprL(B314Parser.ExprLContext ctx) {
         //TODO ajouter profondeur
         System.out.println(ctx.getText());
-        if (ctx.identifier()!=null){
+        /*if (ctx.identifier()!=null){
             printer.printLoadAdress(this.getPCodeTypes(ctx.identifier().getText()),0,this.getVarIndex(ctx.getText()));
         }
         else {
            // printer.printLoadAdress(this.getPCodeTypes());
         }
-
+*/
 
         return null;
     }
 
     @Override
     public Object visitArrayExpr(B314Parser.ArrayExprContext ctx) {
-        //TODO Vérifier
 
 
 
-        return super.visitArrayExpr(ctx);
+        TypedSymbol sym=(TypedSymbol) currentScope.resolve(ctx.identifier().getText());
+        be.unamur.info.b314.compiler.symtab.ArrayType array =(be.unamur.info.b314.compiler.symtab.ArrayType) sym.getType();
+
+        //Load first ind
+        ctx.exprInt(0).accept(this);
+        //Shift adress
+        printer.printIndexedAdressComputation(array.firstArg);
+
+        if(array.secondArg!=null){
+            ctx.exprInt(1).accept(this);
+            printer.printIndexedAdressComputation(1);
+        }
+
+        if(sym.getType().toString().equals("integer[]")){
+            printer.printIndexedFetch(PCodePrinter.PCodeTypes.Int);
+        }
+
+        if(sym.getType().toString().equals("boolean[]")){
+            printer.printIndexedFetch(PCodePrinter.PCodeTypes.Bool);
+        }
+
+
+        return null;
     }
 
     @Override
