@@ -23,7 +23,7 @@ declare and retain
 	i2 as integer;
 	b6 as boolean;
 	    v2 as boolean[5, 7];
-    v3 as integer[42, 58];
+    v3 as boolean[42,56];
     v4 as integer[42];
     i3 as integer;
     s2 as square;
@@ -35,7 +35,7 @@ declare and retain
      declare local
     x1 as square;
     	do
-    		if not fct3() or y and x = 2 then
+    		if  y and x = 2 then
     			while x < i3 do
     				set x to x + 1
     			done
@@ -65,10 +65,9 @@ by default
     do
     	compute fct1()
     	set s1 to fct1()
+    	compute v3[1,1]
     	if fct5(i1 + 2, s2 = ammo, ennemi) > 2 then
     		skip
     	done
-    	while fct3() do
-    		skip
-    	done
+
     done
