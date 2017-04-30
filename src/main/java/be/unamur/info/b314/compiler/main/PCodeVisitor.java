@@ -41,15 +41,15 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitRoot(B314Parser.RootContext ctx) {
         currentScope=this.scope;
-
+/*
         //TODO test
         System.out.println("index : "+this.getVarIndex("v3"));
         System.out.println("index : "+this.getVarIndex("v2"));
         System.out.println("index : "+this.getVarIndex("v4"));
 
         TypedSymbol sym=(TypedSymbol) currentScope.resolve("v3");
-        System.out.println(sym.getType());
-
+        System.out.println("le type est "+this.getPCodeTypes("fct5"));
+*/
 
         return super.visitRoot(ctx);
     }
@@ -61,11 +61,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         ////Visit global decl of var and fct
         ctx.globdecl().accept(this);
 
-        printer.printComments("");
-        printer.printComments("------START PROGRAM-----");
 
-        //Begin of the program
-        printer.printDefineLabel("begin");
 
         //Visit When clause
         for (B314Parser.ClauseWhenContext clauseWhenContext : ctx.clauseWhen()) {
@@ -75,14 +71,28 @@ public class PCodeVisitor extends B314BaseVisitor {
         //Visit Default clause
         ctx.clauseDefault().accept(this);
 
+        printer.printComments("");
+        printer.printComments("------START PROGRAM-----");
+
+        //Begin of the program
+        printer.printDefineLabel("begin");
+
+        for (int i = 0; i <this.whenIndex ; i++) {
+            printer.printCallUserProcedure(0,"when"+i);
+        }
+        printer.printCallUserProcedure(0,"default");
+
         return null;
     }
 
     @Override
     public Object visitWhenClause(B314Parser.WhenClauseContext ctx) {
 
+
         printer.printComments("");
         printer.printComments("Begin whenClause : "+this.whenIndex);
+
+        printer.printDefineLabel("when"+this.whenIndex);
 
         //Save currentScope
         Scope oldScope = currentScope;
@@ -95,7 +105,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         ctx.exprBool().accept(this);
 
         //If false jump at the end
-        printer.printFalseJump("endWhen"+this.whenIndex);
+        printer.printFalseJump("endWhen"+(this.whenIndex-1));
 
         if(ctx.localvardecl()!=null) {
             ctx.localvardecl().accept(this);
@@ -105,9 +115,10 @@ public class PCodeVisitor extends B314BaseVisitor {
             instructionContext.accept(this);
         }
 
-
-        printer.printDefineLabel("endWhen"+this.whenIndex);
+        printer.printDefineLabel("endWhen"+(this.whenIndex-1));
         currentScope=oldScope;
+
+        printer.printReturnFromProcedure();
 
         printer.printComments("End whenClause : "+(this.whenIndex-1));
         return null;
@@ -116,9 +127,12 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitDefaultClause(B314Parser.DefaultClauseContext ctx) {
 
+
+
         printer.printComments("");
         printer.printComments("Begin Default");
 
+        printer.printDefineLabel("default");
         //Save currentScope
         Scope oldScope =currentScope;
 
@@ -156,7 +170,7 @@ public class PCodeVisitor extends B314BaseVisitor {
             printer.printStop();
         }
 
-
+        printer.printReturnFromProcedure();
         printer.printComments("End Default");
 
         return null;
@@ -232,8 +246,9 @@ public class PCodeVisitor extends B314BaseVisitor {
         //Load value et to var
         ctx.expr().accept(this);
 
+        //TODO Gérer les cas ou tab et fct
         //Store the Value
-        printer.printStore(this.getPCodeTypes(ctx.exprL().getText()));
+       // printer.printStore(this.getPCodeTypes(ctx.exprL().getText()));
 
         return null;
     }
@@ -445,7 +460,7 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitLocalDeclaration(B314Parser.LocalDeclarationContext ctx) {
-        this.spaceVar = 0;
+
         // We start by visiting the vars
 
 
@@ -809,14 +824,11 @@ public class PCodeVisitor extends B314BaseVisitor {
            // printer.printLoadAdress(this.getPCodeTypes());
         }
 */
-
         return null;
     }
 
     @Override
     public Object visitArrayExpr(B314Parser.ArrayExprContext ctx) {
-
-
 
         TypedSymbol sym=(TypedSymbol) currentScope.resolve(ctx.identifier().getText());
         be.unamur.info.b314.compiler.symtab.ArrayType array =(be.unamur.info.b314.compiler.symtab.ArrayType) sym.getType();
@@ -921,6 +933,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         TypedSymbol sym =(TypedSymbol)this.currentScope.resolve(nameVar);
 
         System.out.println(nameVar);
+        System.out.println(currentScope);
         if (sym.getType().toString().equals("integer")) {
             return PCodePrinter.PCodeTypes.Int;
         }
