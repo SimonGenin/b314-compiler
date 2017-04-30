@@ -18,6 +18,7 @@ public class FunctionSymbol extends SymbolWithScope implements TypedSymbol {
 
 	public FunctionSymbol (String name) {
 		super(name);
+		setCounterOffset(5);
 	}
 
 	@Override
