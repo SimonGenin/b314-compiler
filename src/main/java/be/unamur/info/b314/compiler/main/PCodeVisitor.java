@@ -53,9 +53,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         System.out.println("le type est "+this.getPCodeTypes("fct5"));
 
 */
-        FunctionSymbol fsym = (FunctionSymbol) currentScope.resolve("fct5");
-        BaseSymbol sym = (BaseSymbol) fsym.resolve("x") ;
-        System.out.println(sym.getDepth());
+
 
 
         return super.visitRoot(ctx);
