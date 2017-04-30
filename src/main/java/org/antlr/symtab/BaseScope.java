@@ -94,6 +94,10 @@ public abstract class BaseScope implements Scope {
 
 	private int currentCounter = 0;
 
+	public void setCounterOffset(int offset) {
+		currentCounter += offset;
+	}
+
 	public void define(Symbol sym) throws IllegalArgumentException {
 		if ( symbols.containsKey(sym.getName()) ) {
 			throw new IllegalArgumentException("duplicate symbol "+sym.getName());

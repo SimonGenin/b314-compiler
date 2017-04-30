@@ -116,6 +116,8 @@ public class Visitor extends B314BaseVisitor
         symbolTable.definePredefinedSymbol(rockVarSquare);
         symbolTable.definePredefinedSymbol(vinesVarSquare);
 
+        symbolTable.GLOBALS.setCounterOffset(99);
+
         LOG.debug("[SymTab] predefined words set up");
 
     }
