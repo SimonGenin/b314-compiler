@@ -31,7 +31,7 @@ declare and retain
     	do
     		skip
     	done
-    fct5 as function(x as integer, y as boolean, z as square):integer
+  fct5 as function(x as integer, y as boolean, z as square):integer
      declare local
     x1 as square;
     	do
