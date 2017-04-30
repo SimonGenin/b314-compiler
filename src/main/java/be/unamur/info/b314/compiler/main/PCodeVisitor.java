@@ -485,7 +485,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         if (ctx.MUL()!=null){
             printer.printMul(PCodePrinter.PCodeTypes.Int);
         }
-        else {
+       if(ctx.DIV()!=null) {
            printer.printDiv(PCodePrinter.PCodeTypes.Int);
        }
         return null;
