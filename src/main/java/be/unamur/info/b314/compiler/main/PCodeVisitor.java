@@ -83,8 +83,10 @@ public class PCodeVisitor extends B314BaseVisitor {
         printer.printDefineLabel("begin");
 
         for (int i = 0; i <this.whenIndex ; i++) {
+            printer.printMarkStack(0);
             printer.printCallUserProcedure(0,"when"+i);
         }
+        printer.printMarkStack(0);
         printer.printCallUserProcedure(0,"default");
 
         return null;
