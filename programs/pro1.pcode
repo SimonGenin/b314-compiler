@@ -1,0 +1,447 @@
+ssp 2539
+lda i 0 0
+read
+sto i
+lda i 0 1
+read
+sto i
+lda i 0 2
+read
+sto i
+lda i 0 3
+read
+sto i
+lda i 0 4
+read
+sto i
+lda i 0 5
+read
+sto i
+lda i 0 6
+read
+sto i
+lda i 0 7
+read
+sto i
+lda i 0 8
+read
+sto i
+lda i 0 9
+read
+sto i
+lda i 0 10
+read
+sto i
+lda i 0 11
+read
+sto i
+lda i 0 12
+read
+sto i
+lda i 0 13
+read
+sto i
+lda i 0 14
+read
+sto i
+lda i 0 15
+read
+sto i
+lda i 0 16
+read
+sto i
+lda i 0 17
+read
+sto i
+lda i 0 18
+read
+sto i
+lda i 0 19
+read
+sto i
+lda i 0 20
+read
+sto i
+lda i 0 21
+read
+sto i
+lda i 0 22
+read
+sto i
+lda i 0 23
+read
+sto i
+lda i 0 24
+read
+sto i
+lda i 0 25
+read
+sto i
+lda i 0 26
+read
+sto i
+lda i 0 27
+read
+sto i
+lda i 0 28
+read
+sto i
+lda i 0 29
+read
+sto i
+lda i 0 30
+read
+sto i
+lda i 0 31
+read
+sto i
+lda i 0 32
+read
+sto i
+lda i 0 33
+read
+sto i
+lda i 0 34
+read
+sto i
+lda i 0 35
+read
+sto i
+lda i 0 36
+read
+sto i
+lda i 0 37
+read
+sto i
+lda i 0 38
+read
+sto i
+lda i 0 39
+read
+sto i
+lda i 0 40
+read
+sto i
+lda i 0 41
+read
+sto i
+lda i 0 42
+read
+sto i
+lda i 0 43
+read
+sto i
+lda i 0 44
+read
+sto i
+lda i 0 45
+read
+sto i
+lda i 0 46
+read
+sto i
+lda i 0 47
+read
+sto i
+lda i 0 48
+read
+sto i
+lda i 0 49
+read
+sto i
+lda i 0 50
+read
+sto i
+lda i 0 51
+read
+sto i
+lda i 0 52
+read
+sto i
+lda i 0 53
+read
+sto i
+lda i 0 54
+read
+sto i
+lda i 0 55
+read
+sto i
+lda i 0 56
+read
+sto i
+lda i 0 57
+read
+sto i
+lda i 0 58
+read
+sto i
+lda i 0 59
+read
+sto i
+lda i 0 60
+read
+sto i
+lda i 0 61
+read
+sto i
+lda i 0 62
+read
+sto i
+lda i 0 63
+read
+sto i
+lda i 0 64
+read
+sto i
+lda i 0 65
+read
+sto i
+lda i 0 66
+read
+sto i
+lda i 0 67
+read
+sto i
+lda i 0 68
+read
+sto i
+lda i 0 69
+read
+sto i
+lda i 0 70
+read
+sto i
+lda i 0 71
+read
+sto i
+lda i 0 72
+read
+sto i
+lda i 0 73
+read
+sto i
+lda i 0 74
+read
+sto i
+lda i 0 75
+read
+sto i
+lda i 0 76
+read
+sto i
+lda i 0 77
+read
+sto i
+lda i 0 78
+read
+sto i
+lda i 0 79
+read
+sto i
+lda i 0 80
+read
+sto i
+lda i 0 81
+read
+sto i
+lda i 0 82
+read
+sto i
+lda i 0 83
+read
+sto i
+lda i 0 84
+read
+sto i
+lda i 0 85
+read
+sto i
+lda i 0 86
+read
+sto i
+lda i 0 87
+read
+sto i
+lda i 0 88
+read
+sto i
+lda i 0 89
+read
+sto i
+lda i 0 90
+read
+sto i
+lda i 0 91
+read
+sto i
+lda i 0 92
+read
+sto i
+lda i 0 93
+read
+sto i
+lda i 0 94
+read
+sto i
+lda i 0 95
+read
+sto i
+lda i 0 96
+read
+sto i
+lda i 0 97
+read
+sto i
+lda i 0 98
+read
+sto i
+ujp @begin
+; 
+; Begin function : fct1
+define @fct1
+ssp 5
+lod i 0 102
+mst 0
+ldc i 1
+ldc b 1
+cup 2 @fct2
+add i
+pop
+lod i 0 102
+ldc i 1
+lod i 0 1
+mod i
+add i
+lod i 0 2
+add i
+lod i 0 102
+sub i
+retf
+; End function : fct1
+; 
+; Begin function : fct2
+define @fct2
+ssp 7
+retf
+; End function : fct2
+; 
+; Begin function : fct3
+define @fct3
+ssp 5
+ldc b 1
+ldc b 0
+and b
+lod b 0 13
+lod b 0 99
+or b
+lod b 0 100
+and b
+not b
+or b
+retf
+; End function : fct3
+; 
+; Begin function : fct4
+define @fct4
+ssp 5
+retf
+; End function : fct4
+; 
+; Begin function : fct5
+define @fct5
+ssp 9
+lod b 0 6
+lod i 0 5
+ldc i 2
+equ i
+and b
+not b
+fjp @If_true1
+lod b 0 7
+mst 0
+cup 0 @fct1
+equ b
+fjp @If_false2
+ldc i 0
+prin
+stp
+define @If_false2
+ujp @If_end2
+define @If_true2
+define @back_while_test1
+lod i 0 5
+lod i 0 2537
+les i
+fjp @Go_out_loop1
+lod i 0 5
+ldc i 1
+add i
+ujp @back_while_test1
+define @Go_out_loop1
+define @If_end2
+retf
+; End function : fct5
+; 
+; Begin whenClause : 0
+define @when0
+ldc b 1
+lod b 0 99
+and b
+fjp @endWhen0
+mst 0
+cup 0 @fct1
+pop
+define @endWhen0
+retp
+; End whenClause : 0
+; 
+; Begin whenClause : 1
+define @when1
+ldc b 1
+lod b 0 99
+and b
+fjp @endWhen1
+mst 0
+cup 0 @fct1
+pop
+define @endWhen1
+retp
+; End whenClause : 1
+; 
+; Begin Default
+define @default
+mst 0
+cup 0 @fct1
+pop
+mst 0
+cup 0 @fct1
+ldc i 1
+ixa 42
+ldc i 1
+ixa 1
+ind b
+pop
+mst 0
+lod i 0 102
+ldc i 2
+add i
+lod b 0 2538
+ldc i 8
+ldc i 5
+cup 3 @fct5
+ldc i 2
+grt i
+fjp @If_false3
+define @If_false3
+ldc i 0
+prin
+stp
+retp
+; End Default
+; 
+; ------START PROGRAM-----
+define @begin
+cup 0 @when0
+cup 0 @when1
+cup 0 @default

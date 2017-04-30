@@ -44,6 +44,10 @@ public abstract class BaseSymbol implements Symbol {
 		return name.equals(((Symbol)obj).getName());
 	}
 
+	public int getDepth() {
+		return scope.getEnclosingPathToRoot().size() - 2;
+	}
+
 	@Override
 	public int hashCode() {
 		return name.hashCode();

@@ -150,21 +150,6 @@ public abstract class BaseScope implements Scope {
 		return s;
 	}
 
-	/** Walk up enclosingScope until we find an object of a specific type.
-	 *  E.g., if you want to get enclosing method, you would pass in
-	 *  MethodSymbol.class, unless of course you have created a subclass for
-	 *  your language implementation.
-	 */
-	public MethodSymbol getEnclosingScopeOfType(Class<?> type) {
-		Scope s = this;
-		while ( s!=null ) {
-			if ( s.getClass()==type ) {
-				return (MethodSymbol)s;
-			}
-			s = s.getEnclosingScope();
-		}
-		return null;
-	}
 
 	@Override
 	public List<Scope> getEnclosingPathToRoot() {

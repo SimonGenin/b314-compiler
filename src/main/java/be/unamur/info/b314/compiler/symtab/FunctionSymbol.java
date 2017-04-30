@@ -21,6 +21,10 @@ public class FunctionSymbol extends SymbolWithScope implements TypedSymbol {
 		setCounterOffset(5);
 	}
 
+	public int getDepth() {
+        return this.getEnclosingPathToRoot().size() - 2;
+    }
+
 	@Override
 	public void define (Symbol sym) throws IllegalArgumentException
 	{
