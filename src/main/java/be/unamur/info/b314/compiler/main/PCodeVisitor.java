@@ -62,7 +62,6 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitProgramRule(B314Parser.ProgramRuleContext ctx) {
 
-
         ////Visit global decl of var and fct
         ctx.globdecl().accept(this);
 
@@ -94,8 +93,7 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     @Override
     public Object visitWhenClause(B314Parser.WhenClauseContext ctx) {
-
-        this.spaceVar=0;
+        this.spaceVar=5;
 
         printer.printComments("");
         printer.printComments("Begin whenClause : "+this.whenIndex);
@@ -141,7 +139,7 @@ public class PCodeVisitor extends B314BaseVisitor {
     public Object visitDefaultClause(B314Parser.DefaultClauseContext ctx) {
 
 
-        this.spaceVar=0;
+        this.spaceVar=5;
         this.currentDepth =1;
 
         printer.printComments("");
