@@ -149,6 +149,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         if(notNext){
             printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,0);
             printer.printPrin();
+            printer.printStop();
             System.out.println("Return prin 0");
         }
 
@@ -278,6 +279,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         }
 
         printer.printPrin();
+        printer.printStop();
 
         return null;
     }
@@ -298,6 +300,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         }
 
         printer.printPrin();
+        printer.printStop();
 
         return null;
     }
@@ -318,6 +321,7 @@ public class PCodeVisitor extends B314BaseVisitor {
         }
 
         printer.printPrin();
+        printer.printStop();
 
         return null;
     }
@@ -327,6 +331,7 @@ public class PCodeVisitor extends B314BaseVisitor {
 
         printer.printLoadConstant(PCodePrinter.PCodeTypes.Int,0);
         printer.printPrin();
+        printer.printStop();
         return null;
     }
 

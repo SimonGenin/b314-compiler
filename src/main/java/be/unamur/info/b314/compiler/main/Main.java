@@ -257,9 +257,6 @@ public class Main {
         //create environement variable
         tree.accept(visitor);
 
-        //finish file out
-        visitor.endPCode();
-
         printer.flush();
         printer.close();
 
