@@ -690,14 +690,11 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitEqualCaseExpr(B314Parser.EqualCaseExprContext ctx) {
 
-
-        //TODO Voir comment le type es défini en mem pour le test egualité
         //Load Values
         ctx.exprCase(0).accept(this);
         ctx.exprCase(1).accept(this);
 
-       // printer.printEqualsValues();
-
+        printer.printEqualsValues(PCodePrinter.PCodeTypes.Int);
 
         return null;
     }
