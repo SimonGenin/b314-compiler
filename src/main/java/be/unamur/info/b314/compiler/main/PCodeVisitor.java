@@ -199,7 +199,7 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitIfThenDoneInstr(B314Parser.IfThenDoneInstrContext ctx) {
 
-        this.ifIndex= this.ifIndex++;
+        this.ifIndex= this.ifIndex+1;
         int i =this.ifIndex;
 
         //Load val of bool
@@ -221,7 +221,7 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitIfThenElseDoneInstr(B314Parser.IfThenElseDoneInstrContext ctx) {
 
-        this.ifIndex= this.ifIndex++;
+        this.ifIndex= this.ifIndex+1;
         int i =this.ifIndex;
         //Load val of bool
         ctx.exprBool().accept(this);
