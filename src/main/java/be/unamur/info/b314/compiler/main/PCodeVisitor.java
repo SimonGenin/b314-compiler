@@ -34,6 +34,8 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     private int currentDepth;
 
+    private boolean initVarPhase;
+
     public PCodeVisitor(SymbolTable symTable, PCodePrinter printer){
         this.symTable=symTable;
         this.printer=printer;
@@ -115,11 +117,19 @@ public class PCodeVisitor extends B314BaseVisitor {
         //If false jump at the end
         printer.printFalseJump("endWhen"+(this.whenIndex-1));
 
+        //Visit local decl to count the space
         if(ctx.localvardecl()!=null) {
             ctx.localvardecl().accept(this);
         }
 
         printer.printSetStackPointer(this.spaceVar);
+
+        //Visit local decl to init var
+        if(ctx.localvardecl()!=null) {
+            this.initVarPhase=true;
+            ctx.localvardecl().accept(this);
+            this.initVarPhase=false;
+        }
 
         for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
             instructionContext.accept(this);
@@ -152,12 +162,19 @@ public class PCodeVisitor extends B314BaseVisitor {
         //Load FunctionScope of when
         currentScope = this.getFunctionScope("default");
 
-
+        //Visit local decl to count space for var
         if(ctx.localvardecl()!=null) {
             ctx.localvardecl().accept(this);
         }
 
         printer.printSetStackPointer(this.spaceVar);
+
+        //Visit local decl to init var
+        if(ctx.localvardecl()!=null) {
+            this.initVarPhase=true;
+            ctx.localvardecl().accept(this);
+            this.initVarPhase=false;
+        }
 
         for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
             instructionContext.accept(this);
@@ -397,12 +414,21 @@ public class PCodeVisitor extends B314BaseVisitor {
             vardeclContext.accept(this);
         }
 
-        //Visit local decl
+        //Visit local decl to count the space
         if(ctx.localvardecl()!=null) {
             ctx.localvardecl().accept(this);
         }
 
         printer.printSetStackPointer(this.spaceVar);
+
+        //Visit local decl to init var
+        if(ctx.localvardecl()!=null) {
+            this.initVarPhase=true;
+            ctx.localvardecl().accept(this);
+            this.initVarPhase=false;
+        }
+
+
 
         //Do all the instruction
         for (B314Parser.InstructionContext instructionContext : ctx.instruction()) {
@@ -431,9 +457,9 @@ public class PCodeVisitor extends B314BaseVisitor {
     public Object visitGlobalDeclaration(B314Parser.GlobalDeclarationContext ctx) {
         this.spaceVar=99;
 
+        printer.printComments("Global_Declaration_Start");
 
-
-        // We start by visiting the vars decl
+        // We start by visiting the vars decl for calculate space mem
         if (ctx.vardecl() != null) {
             for (B314Parser.VardeclContext decl : ctx.vardecl()) {
                 decl.accept(this);
@@ -441,6 +467,14 @@ public class PCodeVisitor extends B314BaseVisitor {
         }
         System.out.println("Reserve space for Global Declaration : "+this.spaceVar);
         printer.printSetStackPointer(this.spaceVar);
+
+        if (ctx.vardecl() != null) {
+            this.initVarPhase =true;
+            for (B314Parser.VardeclContext decl : ctx.vardecl()) {
+                decl.accept(this);
+            }
+            this.initVarPhase=false;
+        }
 
         //Read 99 value
         this.initEnvVar();
@@ -454,7 +488,7 @@ public class PCodeVisitor extends B314BaseVisitor {
                 fctdeclContext.accept(this);
             }
         }
-
+        printer.printComments("Global_Declaration_finish");
         return null;
     }
 
@@ -464,6 +498,12 @@ public class PCodeVisitor extends B314BaseVisitor {
         if (ctx.type().scalar()!=null){
             //add 1 to space for scalar var
             this.spaceVar=this.spaceVar+1;
+            if (this.initVarPhase){
+                printer.printComments("Init var : "+ctx.ID().getText());
+                printer.printLoadAdress(this.getPCodeTypes(ctx.ID().getText()),0,this.getVarIndex(ctx.ID().getText())); //adress var
+                printer.printLoadConstant(this.getPCodeTypes(ctx.ID().getText()),0); //val init
+                printer.printStore(this.getPCodeTypes(ctx.ID().getText()));//Init var
+            }
         }
         else {
             //add size of array for array var
@@ -474,6 +514,19 @@ public class PCodeVisitor extends B314BaseVisitor {
             }
             this.spaceVar=this.spaceVar+(x*y);
 
+            //Init array value
+            if (this.initVarPhase){
+                printer.printComments("Init array : "+ctx.ID().getText());
+                for (int i = (this.getVarIndex(ctx.ID().getText())); i < (this.getVarIndex(ctx.ID().getText())+(x*y)); i++) {
+
+                        printer.printLoadAdress(this.getPCodeTypes(ctx.ID().getText()),0,i); //adress var
+                        printer.printLoadConstant(this.getPCodeTypes(ctx.ID().getText()),0); //val init
+                        printer.printStore(this.getPCodeTypes(ctx.ID().getText()));//Init var
+                    }
+                printer.printComments("End Init array : "+ctx.ID().getText());
+            }
+
+
         }
 
         return null;
@@ -483,9 +536,8 @@ public class PCodeVisitor extends B314BaseVisitor {
     public Object visitLocalDeclaration(B314Parser.LocalDeclarationContext ctx) {
 
         // We start by visiting the vars
-
-
         if (ctx.vardecl() != null) {
+            //Calculate space
             for (B314Parser.VardeclContext decl : ctx.vardecl()) {
                 decl.accept(this);
             }
@@ -837,7 +889,7 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitExprL(B314Parser.ExprLContext ctx) {
         //TODO ajouter profondeur
-        System.out.println(ctx.getText());
+        //System.out.println(ctx.getText());
         /*if (ctx.identifier()!=null){
             printer.printLoadAdress(this.getPCodeTypes(ctx.identifier().getText()),0,this.getVarIndex(ctx.getText()));
         }
@@ -903,17 +955,16 @@ public class PCodeVisitor extends B314BaseVisitor {
      */
 
     private PCodePrinter.PCodeTypes typePCVarFct (String nameFct,String nameVar){
-
+        //TODO retirer si pas nécessaire
         FunctionSymbol sym = (FunctionSymbol) this.scope.resolve(nameFct);
 
         //Fonction scope
         Scope fctScope = (Scope) sym.getAllSymbols().get(0).getScope();
 
-        System.out.println("test"+fctScope);
+
 
         TypedSymbol symbol =(TypedSymbol) fctScope.resolve(nameVar);
 
-        System.out.println("test"+symbol);
 
        if (symbol.getType().toString().equals("integer")) {
            return PCodePrinter.PCodeTypes.Int;
@@ -930,7 +981,6 @@ public class PCodeVisitor extends B314BaseVisitor {
      * @return Scope of  the function
      */
     private Scope getFunctionScope(String nameFct){
-        System.out.println(nameFct);
         FunctionSymbol sym = (FunctionSymbol) this.scope.resolve(nameFct);
 
 
@@ -953,9 +1003,7 @@ public class PCodeVisitor extends B314BaseVisitor {
     private PCodePrinter.PCodeTypes getPCodeTypes(String nameVar){
         TypedSymbol sym =(TypedSymbol)this.currentScope.resolve(nameVar);
 
-        System.out.println(nameVar);
-        System.out.println(currentScope);
-        if (sym.getType().toString().equals("integer")) {
+        if (sym.getType().toString().equals("integer")||sym.getType().toString().equals("integer[]")||sym.getType().toString().equals("square")||sym.getType().toString().equals("square[]")) {
             return PCodePrinter.PCodeTypes.Int;
         }
         else {
@@ -970,7 +1018,6 @@ public class PCodeVisitor extends B314BaseVisitor {
      */
     private int getVarIndex(String nameVar){
 
-        System.out.println("test : "+ nameVar);
         BaseSymbol symbol =(BaseSymbol) currentScope.resolve(nameVar);
 
         return symbol.getScopeCounter();
