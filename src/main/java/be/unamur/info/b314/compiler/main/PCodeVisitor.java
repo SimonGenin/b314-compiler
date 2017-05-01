@@ -45,19 +45,6 @@ public class PCodeVisitor extends B314BaseVisitor {
     @Override
     public Object visitRoot(B314Parser.RootContext ctx) {
         currentScope=this.scope;
-/*
-        //TODO test
-        System.out.println("index : "+this.getVarIndex("v3"));
-        System.out.println("index : "+this.getVarIndex("v2"));
-        System.out.println("index : "+this.getVarIndex("v4"));
-
-        TypedSymbol sym=(TypedSymbol) currentScope.resolve("v3");
-        System.out.println("le type est "+this.getPCodeTypes("fct5"));
-
-*/
-
-
-
         return super.visitRoot(ctx);
     }
 
@@ -280,9 +267,14 @@ public class PCodeVisitor extends B314BaseVisitor {
         //Load value et to var
         ctx.expr().accept(this);
 
-        //TODO Gérer les cas ou tab et fct
-        //Store the Value
-       // printer.printStore(this.getPCodeTypes(ctx.exprL().getText()));
+        //Store value
+        if (ctx.exprL().identifier()!=null){
+            printer.printStore(this.getPCodeTypes(ctx.exprL().identifier().getText()));        }
+        else {
+            printer.printStore(this.getPCodeTypes(ctx.exprL().arrayExpr().identifier().getText()));
+        }
+
+
 
         return null;
     }
@@ -890,13 +882,29 @@ public class PCodeVisitor extends B314BaseVisitor {
     public Object visitExprL(B314Parser.ExprLContext ctx) {
         //TODO ajouter profondeur
         //System.out.println(ctx.getText());
-        /*if (ctx.identifier()!=null){
-            printer.printLoadAdress(this.getPCodeTypes(ctx.identifier().getText()),0,this.getVarIndex(ctx.getText()));
+        if (ctx.identifier()!=null){
+            printer.printLoadAdress(this.getPCodeTypes(ctx.identifier().getText()),this.getVarDepth(ctx.identifier().getText()),this.getVarIndex(ctx.getText()));
         }
         else {
-           // printer.printLoadAdress(this.getPCodeTypes());
+            TypedSymbol sym=(TypedSymbol) currentScope.resolve(ctx.arrayExpr().identifier().getText());
+            be.unamur.info.b314.compiler.symtab.ArrayType array =(be.unamur.info.b314.compiler.symtab.ArrayType) sym.getType();
+
+            //Load address array
+            printer.printLoadAdress(this.getPCodeTypes(ctx.arrayExpr().identifier().getText()),this.getVarDepth(ctx.arrayExpr().identifier().getText()),this.getVarIndex(ctx.arrayExpr().identifier().getText()));
+            //Load first ind
+            ctx.arrayExpr().exprInt(0).accept(this);
+            //Shift adress
+            printer.printIndexedAdressComputation(array.firstArg);
+
+            //Load second ind
+            if(ctx.arrayExpr().exprInt(1)!=null){
+                ctx.arrayExpr().exprInt(1).accept(this);
+                printer.printIndexedAdressComputation(1);
+            }
+            printer.printIndexedFetch(this.getPCodeTypes(ctx.arrayExpr().identifier().getText()));
+
         }
-*/
+
         return null;
     }
 
@@ -1014,22 +1022,35 @@ public class PCodeVisitor extends B314BaseVisitor {
     /**
      *
      * @param nameVar var's name
-     * @return Index of var in the Scope
+     * @return Index of var in the Scope or if it's a function id return 0
      */
     private int getVarIndex(String nameVar){
+        try {
+            FunctionSymbol f = (FunctionSymbol) currentScope.resolve(nameVar);
+            return 0;
+        }
+        catch (Exception e){
+            BaseSymbol symbol =(BaseSymbol) currentScope.resolve(nameVar);
+            return symbol.getScopeCounter();
+        }
 
-        BaseSymbol symbol =(BaseSymbol) currentScope.resolve(nameVar);
 
-        return symbol.getScopeCounter();
     }
 
     /**
      *
      * @param nameVar var's name
-     * @return Depth of var
+     * @return Depth of var or 0 if it's a fonction name
      */
     private int getVarDepth(String nameVar){
-        BaseSymbol sym = (BaseSymbol) currentScope.resolve(nameVar) ;
-        return this.currentDepth- sym.getDepth();
+        try {
+            FunctionSymbol f = (FunctionSymbol) currentScope.resolve(nameVar);
+            return 0;
+        }
+        catch (Exception e){
+            BaseSymbol sym = (BaseSymbol) currentScope.resolve(nameVar) ;
+            return this.currentDepth- sym.getDepth();
+        }
+
     }
 }

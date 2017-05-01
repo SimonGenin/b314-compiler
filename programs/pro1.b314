@@ -40,6 +40,7 @@ declare and retain
     		if  y and x = 2 then
     			while x < i3 do
     				set x to x + 1
+    				set v3[1,1] to true
     			done
     		else
     			if z = fct1() then
