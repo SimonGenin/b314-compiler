@@ -943,9 +943,15 @@ public class PCodeVisitor extends B314BaseVisitor {
 
     public void initEnvVar(){
         for (int i = 0; i <99 ; i++) {
-            printer.printLoadAdress(PCodePrinter.PCodeTypes.Int,0,i);
-            printer.printRead();
-            printer.printStore(PCodePrinter.PCodeTypes.Int);
+            if ((i>=9)&&(i<=16)){
+                printer.printLoadAdress(PCodePrinter.PCodeTypes.Bool,0,i);
+                printer.printRead();
+                printer.printStore(PCodePrinter.PCodeTypes.Bool);
+            }else {
+                printer.printLoadAdress(PCodePrinter.PCodeTypes.Int, 0, i);
+                printer.printRead();
+                printer.printStore(PCodePrinter.PCodeTypes.Int);
+            }
         }
 
     }
