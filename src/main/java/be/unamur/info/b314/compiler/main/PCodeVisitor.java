@@ -269,7 +269,8 @@ public class PCodeVisitor extends B314BaseVisitor {
 
         //Store value
         if (ctx.exprL().identifier()!=null){
-            printer.printStore(this.getPCodeTypes(ctx.exprL().identifier().getText()));        }
+            printer.printStore(this.getPCodeTypes(ctx.exprL().identifier().getText()));
+        }
         else {
             printer.printStore(this.getPCodeTypes(ctx.exprL().arrayExpr().identifier().getText()));
         }
@@ -901,7 +902,6 @@ public class PCodeVisitor extends B314BaseVisitor {
                 ctx.arrayExpr().exprInt(1).accept(this);
                 printer.printIndexedAdressComputation(1);
             }
-            printer.printIndexedFetch(this.getPCodeTypes(ctx.arrayExpr().identifier().getText()));
 
         }
 
