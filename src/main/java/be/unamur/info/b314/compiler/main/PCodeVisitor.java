@@ -896,7 +896,7 @@ public class PCodeVisitor extends B314BaseVisitor {
             //Load second ind
             if(ctx.arrayExpr().exprInt(1)!=null){
                 //Shift adress
-                printer.printIndexedAdressComputation(array.firstArg);
+                printer.printIndexedAdressComputation(array.secondArg);
                 ctx.arrayExpr().exprInt(1).accept(this);
                 printer.printIndexedAdressComputation(1);
             }
@@ -925,7 +925,7 @@ public class PCodeVisitor extends B314BaseVisitor {
 
         if(array.secondArg!=null){
             //Shift adress
-            printer.printIndexedAdressComputation(array.firstArg);
+            printer.printIndexedAdressComputation(array.secondArg);
             ctx.exprInt(1).accept(this);
             printer.printIndexedAdressComputation(1);
         }
