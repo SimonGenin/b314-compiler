@@ -911,6 +911,9 @@ public class PCodeVisitor extends B314BaseVisitor {
         TypedSymbol sym=(TypedSymbol) currentScope.resolve(ctx.identifier().getText());
         be.unamur.info.b314.compiler.symtab.ArrayType array =(be.unamur.info.b314.compiler.symtab.ArrayType) sym.getType();
 
+        //Load adress of array
+        printer.printLoadAdress(this.getPCodeTypes(ctx.identifier().getText()),this.getVarDepth(ctx.identifier().getText()),this.getVarIndex(ctx.identifier().getText()));
+
         //Load first ind
         ctx.exprInt(0).accept(this);
         //Shift adress
