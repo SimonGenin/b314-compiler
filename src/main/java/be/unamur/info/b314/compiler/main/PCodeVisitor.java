@@ -891,12 +891,17 @@ public class PCodeVisitor extends B314BaseVisitor {
             printer.printLoadAdress(this.getPCodeTypes(ctx.arrayExpr().identifier().getText()),this.getVarDepth(ctx.arrayExpr().identifier().getText()),this.getVarIndex(ctx.arrayExpr().identifier().getText()));
             //Load first ind
             ctx.arrayExpr().exprInt(0).accept(this);
-            //Shift adress
-            printer.printIndexedAdressComputation(array.firstArg);
+
 
             //Load second ind
             if(ctx.arrayExpr().exprInt(1)!=null){
+                //Shift adress
+                printer.printIndexedAdressComputation(array.firstArg);
                 ctx.arrayExpr().exprInt(1).accept(this);
+                printer.printIndexedAdressComputation(1);
+            }
+            else {
+                //Shift adress
                 printer.printIndexedAdressComputation(1);
             }
 
@@ -916,11 +921,16 @@ public class PCodeVisitor extends B314BaseVisitor {
 
         //Load first ind
         ctx.exprInt(0).accept(this);
-        //Shift adress
-        printer.printIndexedAdressComputation(array.firstArg);
+
 
         if(array.secondArg!=null){
+            //Shift adress
+            printer.printIndexedAdressComputation(array.firstArg);
             ctx.exprInt(1).accept(this);
+            printer.printIndexedAdressComputation(1);
+        }
+        else {
+            //Shift adress
             printer.printIndexedAdressComputation(1);
         }
 
