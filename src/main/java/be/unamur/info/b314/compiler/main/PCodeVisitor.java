@@ -934,7 +934,7 @@ public class PCodeVisitor extends B314BaseVisitor {
             printer.printIndexedAdressComputation(1);
         }
 
-        if(sym.getType().toString().equals("integer[]")){
+        if(sym.getType().toString().equals("integer[]")||sym.getType().toString().equals("square[]")){
             printer.printIndexedFetch(PCodePrinter.PCodeTypes.Int);
         }
 
