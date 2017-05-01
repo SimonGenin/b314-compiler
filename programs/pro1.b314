@@ -1,76 +1,53 @@
-/* My comments */
+/*
+
+0
+
+0,0,0
+
+0,0,0,0,0
+*/
 declare and retain
-    xy as integer;
-	b1 as boolean;
-	b2 as boolean;
-	b3 as boolean;
-    fct1 as function():square
-    	do
-    		compute i1 + fct2(1, true)
-    		set i1 to i1 + 1 % longitude + grid size - i1
-    	done
-    i1 as integer;
-	b4 as boolean;
-	b5 as boolean;
-    fct2 as function(x as integer, y as boolean):integer
-    	do
-    		skip
-    	done
-    fct3 as function():boolean
-    	do
-    		set fct3 to true and false or not graal is north or b1 and b2
-    	done
-	s1 as square;
-	i2 as integer;
-	b6 as boolean;
-	    v2 as boolean[5, 7];
-    v3 as boolean[42,56];
-    v4 as integer[42];
-    v5 as square[10];
-    i3 as integer;
-    s2 as square;
-    fct4 as function():square
-    	do
-    		skip
-    	done
-  fct5 as function(x as integer, y as boolean, z as square):integer
-     declare local
-    x1 as square;
-    	do
-    		if  y and x = 2 then
-    			while x < i3 do
-    				set x to x + 1
-    				set v3[1,1] to true
-    			done
-    		else
-    			if z = fct1() then
-    				next do nothing
-    			done
-    		done
-    	done
+    b as boolean;
+    i as integer;
+	j as integer;
+    s as square;
+    t3 as square[5,5];
 when your turn
-when true and b1
-   declare local
-      x1 as square;
-  do
-
-		compute fct1()
-	done
-	when true and b1
-       declare local
-          x1 as square;
-      do
-
-    		compute fct1()
-    	done
-
 by default
     do
-    	compute fct1()
-    	set s1 to fct1()
-    	compute v3[1,1]
-    	if fct5(i1 + 2, s2 = ammo, ennemi) > 2 then
-    		skip
-    	done
+		set i to 0
+		set j to 0
 
+		while i < 5 do
+			while j < 5 do
+				if i % 2 = 0 and j % 2 = 0 then
+					set t3[i,j] to rock
+				else
+					set t3[i,j] to vines
+				done
+				set j to j + 1
+			done
+			set i to i + 1
+		done
+
+		set i to 0
+		set j to 0
+
+		while i < 5 do
+			while j < 5 do
+				if i % 2 = 0 and j % 2 = 0 then
+					if not t3[i,j] = rock then
+						next move west
+					done
+				else
+					if not t3[i,j] = vines then
+						next move west
+					done
+				done
+				set j to j + 1
+			done
+			set i to i + 1
+		done
+
+        next do nothing
     done
